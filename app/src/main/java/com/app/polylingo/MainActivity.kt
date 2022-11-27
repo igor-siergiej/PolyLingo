@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import com.app.polylingo.ui.dictionary.DictionaryScreen
 import com.app.polylingo.ui.games.GamesScreen
 import com.app.polylingo.ui.home.HomeScreen
+import com.app.polylingo.ui.language.LanguageScreen
 import com.app.polylingo.ui.navigation.Screen
 import com.app.polylingo.ui.theme.PolyLingoTheme
 
@@ -49,11 +50,12 @@ private fun BuildNavigationGraph() {
     // Each composable destination in the graph is associated with a route.
     NavHost(
         navController = navController,
-        startDestination = Screen.Home.route
+        startDestination = Screen.Language.route
     ) {
         composable(Screen.Home.route) { HomeScreen(navController) }
         composable(Screen.Dictionary.route) { DictionaryScreen(navController)}
         composable(Screen.Games.route) { GamesScreen(navController)}
+        composable(Screen.Language.route) { LanguageScreen(navController)}
     }
 }
 

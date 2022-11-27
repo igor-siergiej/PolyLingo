@@ -4,4 +4,7 @@
     <string name="home">Home</string>
     <string name="dictionary">Dictionary</string>
     <string name="games">Games</string>
+    <string name="welcome">Welcome to PolyLingo</string>
+    <string name="enter_language">Enter your language</string>
+    <string name="enter_learning_language">Enter the language you want to learn</string>
 </resources>
