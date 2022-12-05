@@ -1,5 +1,9 @@
 package com.app.polylingo.ui.language
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.ui.geometry.Size
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -66,7 +70,7 @@ private fun LanguageScreenContent(
             "Portuguese"
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(100.dp))
 
         MyDropDownMenu(
             selectedItem = currentLanguage,
@@ -123,7 +127,7 @@ private fun LanguageScreenContent(
                     }
                 },
                 content = {
-                    Text(text = "Get Started")
+                    Text(text = stringResource(id = R.string.get_started_button))
                 },
                 modifier = Modifier.padding(top = 15.dp, end = 15.dp)
             )
@@ -143,10 +147,9 @@ fun MyDropDownMenu(
     var expanded by remember { mutableStateOf(false) }
     var textFieldSize by remember { mutableStateOf(Size.Zero) }
 
+
     var supportingText = stringResource(id = R.string.language_error_message)
     val keyboardController = LocalSoftwareKeyboardController.current
-    // THIS WORKS
-    // CHANGE THIS SLOWLY TO THE EDITABLE BOX
 
     OutlinedTextField(
         value = selectedItem,
@@ -168,10 +171,13 @@ fun MyDropDownMenu(
             } else {
                 Text("")
             }
-        }
+        },
     )
+
+
     val filteringOptions =
         items.filter { it.contains(selectedItem, ignoreCase = true) }
+
     DropdownMenu(
         properties = PopupProperties(focusable = false),
         expanded = expanded,
@@ -180,20 +186,13 @@ fun MyDropDownMenu(
             .width(with(LocalDensity.current) { textFieldSize.width.toDp() })
             .requiredSizeIn(maxHeight = 200.dp)
     ) {
-        if (filteringOptions.isEmpty()) {
-            expanded = false
-        } else {
-            if (filteringOptions.size == 1) {
-
-            }
-            filteringOptions.forEachIndexed { index, s ->
-                DropdownMenuItem(onClick = {
-                    changeText(s)
-                    expanded = false
-                    keyboardController?.hide()
-                },
-                    text = { Text(text = s) })
-            }
+        filteringOptions.forEach { string ->
+            DropdownMenuItem(onClick = {
+                changeText(string)
+                expanded = false
+                keyboardController?.hide()
+            },
+                text = { Text(text = string) })
         }
     }
 }

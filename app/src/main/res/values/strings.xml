@@ -7,5 +7,7 @@
     <string name="welcome">Welcome to PolyLingo</string>
     <string name="enter_language">Enter your language</string>
     <string name="enter_learning_language">Enter the language you want to learn</string>
-    <string name="language_error_message">Please enter a valid language</string>
+    <string name="language_error_message">Please enter a language</string>
+    <string name="get_started_button">Get Started!</string>
+    <string name="add_word">Add Word</string>
 </resources>

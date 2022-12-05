@@ -5,6 +5,7 @@ sealed class Screen(val route: String) {
     object Dictionary : Screen("dictionary")
     object Games : Screen("games")
     object Language : Screen("language")
+    object AddWord : Screen("addWord")
 }
 
 val screens = listOf(

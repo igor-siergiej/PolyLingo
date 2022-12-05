@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.app.polylingo.ui.addWord.AddWordScreen
 import com.app.polylingo.ui.dictionary.DictionaryScreen
 import com.app.polylingo.ui.games.GamesScreen
 import com.app.polylingo.ui.home.HomeScreen
@@ -56,6 +57,7 @@ private fun BuildNavigationGraph() {
         composable(Screen.Dictionary.route) { DictionaryScreen(navController)}
         composable(Screen.Games.route) { GamesScreen(navController)}
         composable(Screen.Language.route) { LanguageScreen(navController)}
+        composable(Screen.AddWord.route) { AddWordScreen(navController)}
     }
 }
 
