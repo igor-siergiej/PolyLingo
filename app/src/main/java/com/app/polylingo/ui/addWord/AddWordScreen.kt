@@ -1,23 +1,26 @@
 package com.app.polylingo.ui.addWord
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.app.polylingo.ui.components.MainScaffold
+import com.app.polylingo.R
+import com.app.polylingo.model.Entry
 
 @Composable
 fun AddWordScreen(navController: NavHostController) {
 
     MainScaffold(
-        navController = navController
+        navController = navController,
+        titleText = stringResource(id = R.string.add_entry)
     ) { innerPadding ->
         Surface(
             modifier = Modifier
@@ -40,6 +43,6 @@ private fun AddWordScreenContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
     ) {
-        Text(text = "Add Word")
+
     }
 }

@@ -1,0 +1,25 @@
+package com.app.polylingo.model
+
+import androidx.lifecycle.LiveData
+import androidx.room.*
+
+@Dao
+interface EntryDao {
+    @Insert
+    suspend fun insertSingleEntry(entry: Entry)
+
+    @Insert
+    suspend fun insertMultipleEntries(entryList: List<Entry>)
+
+    @Update
+    suspend fun updateEntry(entry: Entry)
+
+    @Delete
+    suspend fun deleteEntry(entry: Entry)
+
+    @Query("DELETE FROM entries")
+    suspend fun deleteAll()
+
+    @Query("SELECT * FROM entries")
+    fun getAllEntries(): LiveData<List<Entry>>
+}

@@ -7,15 +7,18 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.app.polylingo.ui.components.MainScaffold
+import com.app.polylingo.R
 
 @Composable
 fun HomeScreen(navController: NavHostController) {
 
     MainScaffold(
-        navController = navController
+        navController = navController,
+        titleText = stringResource(id = R.string.app_name)
     ) { innerPadding ->
         Surface(
             modifier = Modifier
@@ -38,6 +41,6 @@ private fun HomeScreenContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
     ) {
-        Text(text = "Home")
+
     }
 }

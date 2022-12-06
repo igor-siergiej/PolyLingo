@@ -10,6 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -19,15 +20,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.window.PopupProperties
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import com.app.polylingo.R
+import com.app.polylingo.model.Entry
+import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.ui.components.LanguageScaffold
+import com.app.polylingo.ui.dictionary.DictionaryScreen
 import com.app.polylingo.ui.navigation.Screen
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
-fun LanguageScreen(navController: NavController) {
-
+fun LanguageScreen(
+    navController: NavController,
+    viewModel: EntryViewModel
+) {
     LanguageScaffold { innerPadding ->
         Surface(
             modifier = Modifier
@@ -36,7 +47,8 @@ fun LanguageScreen(navController: NavController) {
         ) {
             LanguageScreenContent(
                 modifier = Modifier.padding(8.dp),
-                navController
+                navController = navController,
+                viewModel = viewModel
             )
         }
     }
@@ -45,7 +57,8 @@ fun LanguageScreen(navController: NavController) {
 @Composable
 private fun LanguageScreenContent(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    viewModel: EntryViewModel
 ) {
     Column(
         modifier = modifier
@@ -114,6 +127,13 @@ private fun LanguageScreenContent(
                         learningTextFieldError = true
                     }
                     if (!currentTextFieldError && !learningTextFieldError) {
+                        var entry = Entry(
+                           currentLanguage,
+                            learningLanguage
+                        )
+                        CoroutineScope(Dispatchers.IO).launch {
+                            viewModel.addEntry(entry)
+                        }
                         navController.navigate(Screen.Home.route) {
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
@@ -171,9 +191,8 @@ fun MyDropDownMenu(
             } else {
                 Text("")
             }
-        },
+        }
     )
-
 
     val filteringOptions =
         items.filter { it.contains(selectedItem, ignoreCase = true) }

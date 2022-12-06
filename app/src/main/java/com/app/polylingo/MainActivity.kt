@@ -6,15 +6,17 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.ui.addWord.AddWordScreen
-import com.app.polylingo.ui.dictionary.DictionaryScreen
+import com.app.polylingo.ui.dictionary.DictionaryScreenTopLevel
 import com.app.polylingo.ui.games.GamesScreen
 import com.app.polylingo.ui.home.HomeScreen
 import com.app.polylingo.ui.language.LanguageScreen
@@ -39,24 +41,32 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun BuildNavigationGraph() {
+private fun BuildNavigationGraph(
+    entryViewModel: EntryViewModel = viewModel()
+) {
     // The NavController is in a place where all
     // our composables can access it.
     val navController = rememberNavController()
+
+    var test = entryViewModel.entryList.value
 
     // Each NavController is associated with a NavHost.
     // This links the NavController with a navigation graph.
     // As we navigate between composables the content of
     // the NavHost is automatically recomposed.
     // Each composable destination in the graph is associated with a route.
+    var startingDestination = Screen.Home.route;
+    if (entryViewModel.entryList.value?.size == 0) {
+        startingDestination = Screen.Language.route
+    }
     NavHost(
         navController = navController,
-        startDestination = Screen.Language.route
+        startDestination = startingDestination
     ) {
         composable(Screen.Home.route) { HomeScreen(navController) }
-        composable(Screen.Dictionary.route) { DictionaryScreen(navController)}
+        composable(Screen.Dictionary.route) { DictionaryScreenTopLevel(navController,entryViewModel) }
         composable(Screen.Games.route) { GamesScreen(navController)}
-        composable(Screen.Language.route) { LanguageScreen(navController)}
+        composable(Screen.Language.route) { LanguageScreen(navController,entryViewModel)}
         composable(Screen.AddWord.route) { AddWordScreen(navController)}
     }
 }

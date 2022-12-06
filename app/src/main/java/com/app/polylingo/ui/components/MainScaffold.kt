@@ -17,12 +17,12 @@ import com.app.polylingo.ui.navigation.Screen
 @Composable
 fun MainScaffold(
     navController: NavHostController,
+    titleText: String,
     pageContent: @Composable (innerPadding: PaddingValues) -> Unit = {}
 ) {
-
     Scaffold(
         topBar = {
-            MainTopBar()
+            MainTopBar(titleText)
         },
         bottomBar = {
             MainBottomBar(navController)
@@ -56,9 +56,9 @@ fun MainScaffold(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
-                    contentDescription = stringResource(R.string.add_word)
+                    contentDescription = stringResource(R.string.add_entry)
                 )
-                Text(text = stringResource(id = R.string.add_word))
+                Text(text = stringResource(id = R.string.add_entry))
             }
         },
     )
