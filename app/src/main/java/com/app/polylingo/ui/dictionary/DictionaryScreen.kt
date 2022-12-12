@@ -1,21 +1,32 @@
 package com.app.polylingo.ui.dictionary
 
-import android.util.Log
-import android.util.Log.i
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.app.polylingo.R
+import com.app.polylingo.datasource.fileStorage.LanguageViewModel
 import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.ui.components.MainScaffold
@@ -23,19 +34,21 @@ import com.app.polylingo.ui.components.MainScaffold
 @Composable
 fun DictionaryScreenTopLevel(
     navController: NavHostController,
-    entryViewModel: EntryViewModel = viewModel()
+    entryViewModel: EntryViewModel,
+    languageViewModel: LanguageViewModel
 ) {
-    val entries by entryViewModel.entryList.observeAsState(listOf())
     DictionaryScreen(
         navController = navController,
-        entries = entries
+        entryViewModel = entryViewModel,
+        languages = languageViewModel.readLanguages()
     )
 }
 
 @Composable
 fun DictionaryScreen(
     navController: NavHostController,
-    entries: List<Entry>
+    entryViewModel: EntryViewModel,
+    languages: Pair<String, String>
 ) {
     MainScaffold(
         navController = navController,
@@ -47,80 +60,155 @@ fun DictionaryScreen(
                 .fillMaxSize()
         ) {
             DictionaryScreenContent(
-                modifier = Modifier.padding(8.dp),
-                entries = entries
+                entryViewModel = entryViewModel,
+                languages = languages
             )
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
-private fun DictionaryScreenContent(
-    modifier: Modifier = Modifier,
-    entries: List<Entry>
+fun DictionaryScreenContent(
+    entryViewModel: EntryViewModel,
+    languages: Pair<String, String>
 ) {
-    DictionaryColumn(entryList = entries)
-}
+    //TODO uncomment for dictionary to work from db
+    //val entries by entryViewModel.entryList.observeAsState(mutableListOf())
+    val entries = remember {
+        mutableStateListOf(
+            Entry("word1", "word2"),
+            Entry("Word2", "Word3"),
+            Entry("word4", "word6"),
+            Entry("Word5", "Word37"),
+        )
+    }
 
-@Composable
-fun DictionaryColumn(entryList: List<Entry>) {
     LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 100.dp),
+        contentPadding = PaddingValues(5.dp),
     ) {
-        item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(vertical = 25.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+        stickyHeader {
+            Card(
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline)
             ) {
-                if (entryList.isNotEmpty()) {
+                Row(
+                    modifier = Modifier.height(IntrinsicSize.Min)
+                ) {
                     Text(
-                        entryList[1].word,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    Divider(
+                        languages.first,
+                        style = MaterialTheme.typography.titleLarge,
+                        textAlign = TextAlign.Center,
                         modifier = Modifier
-                            .fillMaxHeight()  //fill the max height
+                            .weight(1f)
+                            .padding(vertical = 20.dp)
+                    )
+
+                    Divider(
+                        color = MaterialTheme.colorScheme.outline,
+                        modifier = Modifier
+                            .fillMaxHeight()
                             .width(1.dp)
                     )
+
                     Text(
-                        entryList[1].translatedWord,
-                        style = MaterialTheme.typography.bodyLarge
+                        languages.second,
+                        style = MaterialTheme.typography.titleLarge,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(vertical = 20.dp)
                     )
                 }
             }
-            if (entryList.isNotEmpty()) {
-                entryList.forEach { entry ->
-                    entryCard(entry.word, entry.translatedWord)
-                }
+        }
+        itemsIndexed(
+            items = entries, key = { _, entry -> entry.hashCode() })
+        { _, entry ->
+            if (entries.isNotEmpty()) {
+                val state = rememberDismissState(
+                    confirmStateChange = {
+                        if (it == DismissValue.DismissedToStart) {
+                            //TODO uncomment for dictionary to work from db
+                            /*CoroutineScope(Dispatchers.IO).launch {
+                                entryViewModel.removeEntry(entry)
+                            }*/
+                            entries.remove(entry)
+                        }
+                        true
+                    }
+                )
+                SwipeToDismiss(
+                    state = state, background = {
+                        val color = when (state.dismissDirection) {
+                            DismissDirection.StartToEnd -> Color.Transparent
+                            DismissDirection.EndToStart -> Color.Red
+                            null -> Color.Magenta
+                        }
+                        Box(
+                            modifier = Modifier
+                                .background(color = color)
+                                .fillMaxSize()
+                                .padding(10.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete",
+                                tint = Color.Black,
+                                modifier = Modifier.align(Alignment.CenterEnd)
+                            )
+                        }
+                    },
+                    dismissThresholds = {
+                        androidx.compose.material.FractionalThreshold(0.6f)
+                    },
+                    dismissContent = {
+                        entryCard(entry)
+                    },
+                    directions = setOf(DismissDirection.EndToStart)
+                )
+                Divider()
             }
         }
     }
 }
 
 @Composable
-fun entryCard(entry: String, translatedEntry: String) {
-    Card(
-        modifier = Modifier
-            .padding(10.dp)
-            .fillMaxWidth()
-            .wrapContentHeight(),
+fun entryCard(entry: Entry) {
+    OutlinedCard(
+        shape = RectangleShape,
     ) {
         Row(
+            modifier = Modifier
+                .height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = entry,
-                style = MaterialTheme.typography.bodyMedium,
+                text = entry.word,
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 20.dp)
+            )
+
+            Divider(
+                color = MaterialTheme.colorScheme.outline,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(1.dp)
             )
 
             Text(
-                text = translatedEntry,
-                style = MaterialTheme.typography.bodyMedium,
+                text = entry.translatedWord,
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 20.dp)
             )
         }
     }

@@ -9,7 +9,7 @@ interface EntryDao {
     suspend fun insertSingleEntry(entry: Entry)
 
     @Insert
-    suspend fun insertMultipleEntries(entryList: List<Entry>)
+    suspend fun insertMultipleEntries(entryList: MutableList<Entry>)
 
     @Update
     suspend fun updateEntry(entry: Entry)
@@ -21,5 +21,5 @@ interface EntryDao {
     suspend fun deleteAll()
 
     @Query("SELECT * FROM entries")
-    fun getAllEntries(): LiveData<List<Entry>>
+    fun getAllEntries(): LiveData<MutableList<Entry>>
 }

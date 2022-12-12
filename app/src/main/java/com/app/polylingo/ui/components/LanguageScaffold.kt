@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.app.polylingo.R
 import com.app.polylingo.ui.theme.PolyLingoTheme
 
+// TODO should this be also used for addWordScreen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LanguageScaffold(

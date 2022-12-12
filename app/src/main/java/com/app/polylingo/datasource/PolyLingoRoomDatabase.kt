@@ -41,10 +41,24 @@ abstract class PolyLingoRoomDatabase : RoomDatabase() {
                     super.onCreate(db)
 
                     coroutineScope.launch {
-                        getDatabase(context)!!
+                        populateDatabase(context, getDatabase(context)!!)
+                        //getDatabase(context)
                     }
                 }
             }
+        }
+
+        private suspend fun populateDatabase(context: Context, instance: PolyLingoRoomDatabase) {
+            val word1 = Entry("Cat","Gato")
+            val word2 = Entry("Dog","Perro")
+            val word3 = Entry("Coffee","Cafe")
+
+            val entryList = mutableListOf(
+                word1,word2,word3
+            )
+
+            val dao = instance.entryDao()
+            dao.insertMultipleEntries(entryList)
         }
     }
 }

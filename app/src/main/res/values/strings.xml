@@ -9,5 +9,9 @@
     <string name="enter_learning_language">Enter the language you want to learn</string>
     <string name="language_error_message">Please enter a language</string>
     <string name="get_started_button">Get Started!</string>
-    <string name="add_entry">Add new entry</string>
+    <string name="add_entry">Add New Entry</string>
+    <string name="enter_word">Enter your new word in</string>
+    <string name="please_enter_word">Please enter a word</string>
+    <string name="add_word">Add new word</string>
+    <string name="back">Back</string>
 </resources>
