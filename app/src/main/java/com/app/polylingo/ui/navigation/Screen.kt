@@ -6,6 +6,10 @@ sealed class Screen(val route: String) {
     object Games : Screen("games")
     object Language : Screen("language")
     object AddWord : Screen("addWord")
+    object WordSearch : Screen("wordSearch")
+    object MixAndMatch: Screen("mixAndMatch")
+    object WordOrder: Screen("wordOrder")
+    object GameConfigScreen: Screen("gameConfigScreen")
 }
 
 val screens = listOf(

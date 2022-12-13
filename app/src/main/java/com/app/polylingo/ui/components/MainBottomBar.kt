@@ -3,11 +3,9 @@ package com.app.polylingo.ui.components
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.VideogameAsset
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Pets
 import androidx.compose.material.icons.outlined.VideogameAsset
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar

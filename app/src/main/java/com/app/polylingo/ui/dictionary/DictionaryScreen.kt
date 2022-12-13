@@ -88,7 +88,7 @@ fun DictionaryScreenContent(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 100.dp),
-        contentPadding = PaddingValues(5.dp),
+        contentPadding = PaddingValues(10.dp),
     ) {
         stickyHeader {
             Card(
@@ -169,7 +169,6 @@ fun DictionaryScreenContent(
                     },
                     directions = setOf(DismissDirection.EndToStart)
                 )
-                Divider()
             }
         }
     }
@@ -179,6 +178,9 @@ fun DictionaryScreenContent(
 fun entryCard(entry: Entry) {
     OutlinedCard(
         shape = RectangleShape,
+        colors = CardDefaults.cardColors(
+            MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
+        )
     ) {
         Row(
             modifier = Modifier

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="game_names_list">
+        <item>Word Search</item>
+        <item>Mix and Match</item>
+        <item>Word Order</item>
+    </string-array>
+
+    <string-array name="game_description_list">
+        <item>Find words in a puzzle of letters</item>
+        <item>Pair together words that mean the same thing</item>
+        <item>Find the order of words</item>
+    </string-array>
+</resources>

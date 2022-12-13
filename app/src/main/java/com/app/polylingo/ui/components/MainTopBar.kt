@@ -15,6 +15,9 @@ fun MainTopBar(
 ){
     CenterAlignedTopAppBar(
         title = { Text(titleText) },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
+        ),
         actions = {
             FilledIconButton(onClick = { Unit }/* here there should be an onclick to open the settings dialog*/) {
                 Icon(

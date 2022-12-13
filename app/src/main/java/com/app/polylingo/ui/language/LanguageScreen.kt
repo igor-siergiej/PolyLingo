@@ -116,7 +116,9 @@ private fun LanguageScreenContent(
                     if (learningLanguage.isEmpty()) {
                         learningTextFieldError = true
                     }
-                    if (!currentTextFieldError && !learningTextFieldError) {
+                    if (!currentTextFieldError && !learningTextFieldError || currentLanguage != learningLanguage) {
+                        // TODO test that the user cannot enter the same languages
+
                         // saving selected languages to file
                         CoroutineScope(Dispatchers.IO).launch {
                             languageViewModel.saveLanguages(currentLanguage,learningLanguage)

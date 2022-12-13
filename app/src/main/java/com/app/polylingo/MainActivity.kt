@@ -13,15 +13,19 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.app.polylingo.datasource.fileStorage.LanguageViewModel
 import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.ui.addWord.AddWordScreen
 import com.app.polylingo.ui.dictionary.DictionaryScreenTopLevel
+import com.app.polylingo.ui.games.GameConfigScreen
 import com.app.polylingo.ui.games.GamesScreen
+import com.app.polylingo.ui.games.WordSearchScreen
 import com.app.polylingo.ui.home.HomeScreen
 import com.app.polylingo.ui.language.LanguageScreen
 import com.app.polylingo.ui.navigation.Screen
@@ -54,15 +58,15 @@ private fun BuildNavigationGraph(
     // The NavController is in a place where all
     // our composables can access it.
     val navController = rememberNavController()
-    val coroutineScope = rememberCoroutineScope()
+    // val coroutineScope = rememberCoroutineScope()
 
-   /* LaunchedEffect(key1 = Unit) {
-        coroutineScope.launch {
-            for (i in 5..50) {
-            entryViewModel.addEntry(Entry("word$i", "word$i"))
-        }
-        }
-    }*/
+    /* LaunchedEffect(key1 = Unit) {
+         coroutineScope.launch {
+             for (i in 5..50) {
+             entryViewModel.addEntry(Entry("word$i", "word$i"))
+         }
+         }
+     }*/
 
     // Each NavController is associated with a NavHost.
     // This links the NavController with a navigation graph.
@@ -79,10 +83,41 @@ private fun BuildNavigationGraph(
         startDestination = startingDestination
     ) {
         composable(Screen.Home.route) { HomeScreen(navController) }
-        composable(Screen.Dictionary.route) { DictionaryScreenTopLevel(navController,entryViewModel,languageViewModel) }
-        composable(Screen.Games.route) { GamesScreen(navController)}
-        composable(Screen.Language.route) { LanguageScreen(navController,languageViewModel)}
-        composable(Screen.AddWord.route) { AddWordScreen(navController,entryViewModel,languageViewModel)}
+
+        composable(Screen.Dictionary.route) {
+            DictionaryScreenTopLevel(
+                navController,
+                entryViewModel,
+                languageViewModel
+            )
+        }
+
+        composable(Screen.Games.route) { GamesScreen(navController) }
+
+        composable(Screen.Language.route) { LanguageScreen(navController, languageViewModel) }
+
+        composable(Screen.AddWord.route) {
+            AddWordScreen(
+                navController,
+                entryViewModel,
+                languageViewModel
+            )
+        }
+        composable(Screen.WordSearch.route) { WordSearchScreen(navController) }
+
+        composable(
+            route = "${Screen.GameConfigScreen.route}/{numOfWords}/{time}",
+            arguments = listOf(
+                navArgument("numOfWords") { type = NavType.IntType },
+                (navArgument("time") { type = NavType.IntType })
+            )
+        ) { backStackEntry ->
+            GameConfigScreen(
+                navController = navController,
+                numOfWords = backStackEntry.arguments?.getInt("numOfWords")!!,
+                time = backStackEntry.arguments?.getInt("time")!!
+            )
+        }
     }
 }
 

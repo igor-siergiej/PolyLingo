@@ -132,7 +132,8 @@ private fun AddWordScreenContent(
                     if (translatedWord.isEmpty()) {
                         learningTextFieldError = true
                     }
-                    if (!currentTextFieldError && !learningTextFieldError) {
+                    if (!currentTextFieldError && !learningTextFieldError|| word != translatedWord) {
+                        // TODO test that the user cannot enter the same languages
 
                         CoroutineScope(Dispatchers.IO).launch {
                             entryViewModel.addEntry(Entry(word, translatedWord))
