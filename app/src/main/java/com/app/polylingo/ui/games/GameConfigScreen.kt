@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -22,13 +22,12 @@ import com.app.polylingo.ui.navigation.Screen
 @Composable
 fun GameConfigScreen(
     navController: NavHostController,
-    numOfWords: Int,
-    time: Int
+    gameType: String
 ) {
 
     MainScaffold(
         navController = navController,
-        titleText = stringResource(id = R.string.games)
+        titleText = "$gameType Config"
     ) { innerPadding ->
         Surface(
             modifier = Modifier
@@ -38,8 +37,7 @@ fun GameConfigScreen(
             GamesScreenContent(
                 modifier = Modifier.padding(8.dp),
                 navController = navController,
-                numOfWords = numOfWords,
-                time = time
+                gameType = gameType
             )
         }
     }
@@ -49,11 +47,30 @@ fun GameConfigScreen(
 private fun GamesScreenContent(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    numOfWords: Int,
-    time: Int
+    gameType: String
 ) {
-    Card {
-        Text(text = numOfWords.toString())
-        Text(text = time.toString())
+    var numOfWordsSlider by remember { mutableStateOf(4f) }
+    var timeSliderPosition by remember { mutableStateOf(30f) }
+
+    Column(
+        modifier = Modifier.padding(20.dp)
+    ) {
+        Text(text = numOfWordsSlider.toString())
+
+        Slider(
+        value = numOfWordsSlider,
+            onValueChange = { numOfWordsSlider = it },
+            valueRange = 4f..8f,
+            steps = 3
+        )
+
+        Text(text = timeSliderPosition.toString())
+
+        Slider(
+            value = timeSliderPosition,
+            onValueChange = { timeSliderPosition = it },
+            valueRange = 30f..120f,
+            steps = 3
+        )
     }
 }

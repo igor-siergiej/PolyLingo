@@ -106,25 +106,30 @@ private fun BuildNavigationGraph(
         composable(Screen.WordSearch.route) { WordSearchScreen(navController) }
 
         composable(
-            route = "${Screen.GameConfigScreen.route}/{numOfWords}/{time}",
+            route = "${Screen.GameConfigScreen.route}/{gameType}",
             arguments = listOf(
-                navArgument("numOfWords") { type = NavType.IntType },
-                (navArgument("time") { type = NavType.IntType })
+                navArgument("gameType") { type = NavType.StringType },
             )
         ) { backStackEntry ->
             GameConfigScreen(
                 navController = navController,
-                numOfWords = backStackEntry.arguments?.getInt("numOfWords")!!,
-                time = backStackEntry.arguments?.getInt("time")!!
+                gameType = backStackEntry.arguments?.getString("gameType")!!,
             )
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    PolyLingoTheme {
-        BuildNavigationGraph()
-    }
-}
+/*
+composable(
+route = "${Screen.GameConfigScreen.route}/{numOfWords}/{time}",
+arguments = listOf(
+navArgument("numOfWords") { type = NavType.IntType },
+(navArgument("time") { type = NavType.IntType })
+)
+) { backStackEntry ->
+    GameConfigScreen(
+        navController = navController,
+        numOfWords = backStackEntry.arguments?.getInt("numOfWords")!!,
+        time = backStackEntry.arguments?.getInt("time")!!
+    )
+}*/

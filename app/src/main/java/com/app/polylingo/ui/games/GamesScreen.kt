@@ -62,29 +62,30 @@ private fun GamesScreenContent(
                 headlineText = { Text(gameNamesList[index]) },
                 supportingText = { Text(gameDescriptionList[index]) },
                 colors = ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 10.dp)
                     .clickable {
-                        when (gameName) {
-                            gameNamesList[0] ->
-                                navController.navigate("${Screen.GameConfigScreen.route}/8/2") {
-                                    // this should be navigating without being able to go back
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    // Avoid multiple copies of the same destination when
-                                    // reselecting the same item
-                                    launchSingleTop = true
-                                    // Restore state when reselecting a previously selected item
-                                    restoreState = true
-                                }
-                        }
+                        navigateToGamesConfigScreen(navController,gameName)
                     }
             )
         }
 
+    }
+}
+
+fun navigateToGamesConfigScreen(navController: NavHostController,  gameType: String) {
+    navController.navigate("${Screen.GameConfigScreen.route}/$gameType") {
+        // this should be navigating without being able to go back
+        popUpTo(navController.graph.findStartDestination().id) {
+            saveState = true
+        }
+        // Avoid multiple copies of the same destination when
+        // reselecting the same item
+        launchSingleTop = true
+        // Restore state when reselecting a previously selected item
+        restoreState = true
     }
 }
