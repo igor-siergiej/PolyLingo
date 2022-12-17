@@ -1,4 +1,4 @@
-package com.app.polylingo.ui.components
+package com.app.polylingo.ui.components.scaffolds
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
@@ -6,12 +6,16 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.app.polylingo.R
 
 import androidx.navigation.NavHostController
-import com.app.polylingo.ui.addWord.AddWordScreen
+import androidx.navigation.compose.rememberNavController
+import com.app.polylingo.ui.components.MainBottomBar
+import com.app.polylingo.ui.components.MainTopBar
 import com.app.polylingo.ui.navigation.Screen
+import com.app.polylingo.ui.theme.PolyLingoTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,7 +26,7 @@ fun MainScaffold(
 ) {
     Scaffold(
         topBar = {
-            MainTopBar(titleText)
+            MainTopBar(titleText, navController)
         },
         bottomBar = {
             MainBottomBar(navController)
@@ -62,4 +66,13 @@ fun MainScaffold(
             }
         },
     )
+}
+
+@Preview
+@Composable
+private fun MainScaffoldPreview() {
+    PolyLingoTheme(dynamicColor = false) {
+        var navController = rememberNavController()
+        MainScaffold(navController = navController, titleText = "test", pageContent = {})
+    }
 }

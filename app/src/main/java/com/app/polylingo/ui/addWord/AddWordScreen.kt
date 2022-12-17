@@ -12,13 +12,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import com.app.polylingo.ui.components.MainScaffold
 import com.app.polylingo.R
 import com.app.polylingo.datasource.fileStorage.LanguageViewModel
 import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
-import com.app.polylingo.ui.components.AddWordScaffold
-import com.app.polylingo.ui.components.LanguageScaffold
+import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFAB
 import com.app.polylingo.ui.navigation.Screen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +29,7 @@ fun AddWordScreen(
     languageViewModel: LanguageViewModel
 ) {
 
-    AddWordScaffold(
+    MainScaffoldWithoutFAB(
         navController = navController,
         titleText = stringResource(id = R.string.add_entry)
     ) { innerPadding ->
@@ -107,21 +105,9 @@ private fun AddWordScreenContent(
         )
 
         Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.End,
             modifier = Modifier.fillMaxWidth()
         ) {
-
-            Button(
-                onClick = {
-                    // get the values from the textFields and set them to language names
-                    navController.popBackStack()
-                },
-                content = {
-                    Text(text = stringResource(id = R.string.back))
-                },
-                modifier = Modifier.padding(top = 15.dp, end = 15.dp)
-            )
-
             Button(
                 onClick = {
                     // get the values from the textFields and set them to language names
@@ -155,10 +141,6 @@ private fun AddWordScreenContent(
                 },
                 modifier = Modifier.padding(top = 15.dp, end = 15.dp)
             )
-
-
         }
     }
-
-
 }
