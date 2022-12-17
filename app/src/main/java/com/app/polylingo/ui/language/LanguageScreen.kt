@@ -27,7 +27,8 @@ import kotlin.collections.ArrayList
 //TODO create top level
 @Composable
 fun LanguageScreen(
-    navController: NavController,languageViewModel: LanguageViewModel
+    navController: NavController,
+    languageViewModel: LanguageViewModel
 
 ) {
     LanguageScaffold { innerPadding ->
@@ -110,7 +111,7 @@ private fun LanguageScreenContent(
                     if (learningLanguage.isEmpty()) {
                         learningTextFieldError = true
                     }
-                    if (!currentTextFieldError && !learningTextFieldError || currentLanguage != learningLanguage) {
+                    if (!currentTextFieldError && !learningTextFieldError && currentLanguage != learningLanguage) {
                         // TODO test that the user cannot enter the same languages
 
                         // saving selected languages to file

@@ -41,8 +41,10 @@ fun AddWordScreen(
             AddWordScreenContent(
                 modifier = Modifier.padding(8.dp),
                 navController = navController,
-                entryViewModel = entryViewModel,
-                languages = languageViewModel.readLanguages()
+                languages = languageViewModel.readLanguages(),
+                insertEntry = { newEntry ->
+                    entryViewModel.addEntry(newEntry)
+                }
             )
         }
     }
@@ -53,8 +55,8 @@ fun AddWordScreen(
 private fun AddWordScreenContent(
     modifier: Modifier = Modifier,
     navController: NavController,
-    entryViewModel: EntryViewModel,
     languages: Pair<String, String>,
+    insertEntry: (Entry) -> Unit = {}
 ) {
     var word by remember { mutableStateOf("") }
     var translatedWord by remember { mutableStateOf("") }
@@ -118,13 +120,10 @@ private fun AddWordScreenContent(
                     if (translatedWord.isEmpty()) {
                         learningTextFieldError = true
                     }
-                    if (!currentTextFieldError && !learningTextFieldError|| word != translatedWord) {
-                        // TODO test that the user cannot enter the same languages
-
-                        CoroutineScope(Dispatchers.IO).launch {
-                            entryViewModel.addEntry(Entry(word, translatedWord))
-                        }
-                        navController.navigate(Screen.Home.route) {
+                    if (!currentTextFieldError && !learningTextFieldError && word != translatedWord) {
+                        // TODO test that the user cannot enter the same words
+                        insertEntry(Entry(word,translatedWord))
+                        navController.navigate(Screen.Dictionary.route) {
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
                             }
@@ -134,6 +133,9 @@ private fun AddWordScreenContent(
                             // Restore state when reselecting a previously selected item
                             restoreState = true
                         }
+                    } else {
+                        currentTextFieldError = true
+                        learningTextFieldError = true
                     }
                 },
                 content = {

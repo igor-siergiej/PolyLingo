@@ -58,9 +58,9 @@ private fun BuildNavigationGraph(
     // The NavController is in a place where all
     // our composables can access it.
     val navController = rememberNavController()
-    // val coroutineScope = rememberCoroutineScope()
+    /*val coroutineScope = rememberCoroutineScope()
 
-    /* LaunchedEffect(key1 = Unit) {
+     LaunchedEffect(key1 = Unit) {
          coroutineScope.launch {
              for (i in 5..50) {
              entryViewModel.addEntry(Entry("word$i", "word$i"))

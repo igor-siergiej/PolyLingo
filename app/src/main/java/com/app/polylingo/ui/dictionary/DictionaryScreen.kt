@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,6 +30,9 @@ import com.app.polylingo.datasource.fileStorage.LanguageViewModel
 import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.ui.components.scaffolds.MainScaffold
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun DictionaryScreenTopLevel(
@@ -49,6 +53,7 @@ fun DictionaryScreen(
     entryViewModel: EntryViewModel,
     languages: Pair<String, String>
 ) {
+    val entries by entryViewModel.entryList.observeAsState(mutableListOf())
     MainScaffold(
         navController = navController,
         titleText = stringResource(id = R.string.dictionary)
@@ -59,8 +64,11 @@ fun DictionaryScreen(
                 .fillMaxSize()
         ) {
             DictionaryScreenContent(
-                entryViewModel = entryViewModel,
-                languages = languages
+                languages = languages,
+                entries = entries,
+                removeEntry = { entry ->
+                    entryViewModel.removeEntry(entry)
+                }
             )
         }
     }
@@ -69,20 +77,10 @@ fun DictionaryScreen(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun DictionaryScreenContent(
-    entryViewModel: EntryViewModel,
-    languages: Pair<String, String>
+    entries: MutableList<Entry>,
+    languages: Pair<String, String>,
+    removeEntry: (Entry) -> Unit = {}
 ) {
-    //TODO uncomment for dictionary to work from db
-    //val entries by entryViewModel.entryList.observeAsState(mutableListOf())
-    val entries = remember {
-        mutableStateListOf(
-            Entry("word1", "word2"),
-            Entry("Word2", "Word3"),
-            Entry("word4", "word6"),
-            Entry("Word5", "Word37"),
-        )
-    }
-
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -130,11 +128,7 @@ fun DictionaryScreenContent(
                 val state = rememberDismissState(
                     confirmStateChange = {
                         if (it == DismissValue.DismissedToStart) {
-                            //TODO uncomment for dictionary to work from db
-                            /*CoroutineScope(Dispatchers.IO).launch {
-                                entryViewModel.removeEntry(entry)
-                            }*/
-                            entries.remove(entry)
+                            removeEntry(entry)
                         }
                         true
                     }

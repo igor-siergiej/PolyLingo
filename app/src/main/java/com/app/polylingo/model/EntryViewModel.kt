@@ -1,21 +1,30 @@
 package com.app.polylingo.model
 
 import android.app.Application
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.app.polylingo.datasource.PolyLingoRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class EntryViewModel(application: Application) :AndroidViewModel(application) {
     private val repository: PolyLingoRepository = PolyLingoRepository(application)
 
     var entryList: LiveData<MutableList<Entry>> = repository.getAllEntries()
 
-    suspend fun addEntry(entry: Entry) {
-        repository.insert(entry)
+    fun addEntry(entry: Entry) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.insert(entry)
+        }
     }
 
-    suspend fun removeEntry(entry: Entry) {
-        repository.remove(entry)
+    fun removeEntry(entry: Entry) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.remove(entry)
+        }
     }
 
     // search should be here
