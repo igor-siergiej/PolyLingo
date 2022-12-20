@@ -3,6 +3,7 @@ package com.app.polylingo.ui.dictionary
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -81,15 +82,26 @@ fun DictionaryScreenContent(
     languages: Pair<String, String>,
     removeEntry: (Entry) -> Unit = {}
 ) {
+    var sorted by remember { mutableStateOf(false) }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 75.dp),
         contentPadding = PaddingValues(10.dp),
     ) {
-        // TODO make this header clickable and sort when clicked alphabetically
         stickyHeader {
             Card(
+                //TODO FIX THIS SORTING
+                modifier = Modifier.clickable {
+                    if (sorted == false) {
+                        entries.sortByDescending { it.word }
+                        sorted = true
+                    } else {
+                        entries.sortBy { it.word }
+                        sorted = false
+                    }
+                },
                 border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline)
             ) {
                 Row(

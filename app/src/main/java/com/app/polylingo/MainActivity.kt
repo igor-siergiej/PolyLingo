@@ -25,6 +25,7 @@ import com.app.polylingo.ui.addWord.AddWordScreen
 import com.app.polylingo.ui.dictionary.DictionaryScreenTopLevel
 import com.app.polylingo.ui.games.GameConfigScreen
 import com.app.polylingo.ui.games.GamesScreen
+import com.app.polylingo.ui.games.MixAndMatchScreen
 import com.app.polylingo.ui.games.WordSearchScreen
 import com.app.polylingo.ui.home.HomeScreen
 import com.app.polylingo.ui.language.LanguageScreen
@@ -82,7 +83,7 @@ private fun BuildNavigationGraph(
         navController = navController,
         startDestination = startingDestination
     ) {
-        composable(Screen.Home.route) { HomeScreen(navController) }
+        composable(Screen.Home.route) { HomeScreen(navController,entryViewModel) }
 
         composable(Screen.Dictionary.route) {
             DictionaryScreenTopLevel(
@@ -112,6 +113,21 @@ private fun BuildNavigationGraph(
             )
         ) { backStackEntry ->
             WordSearchScreen(
+                entryViewModel = entryViewModel,
+                navController = navController,
+                numOfWords = backStackEntry.arguments?.getInt("numOfWords")!!,
+                time = backStackEntry.arguments?.getInt("time")!!
+            )
+        }
+
+        composable(
+            route = "${Screen.MixAndMatch.route}/{numOfWords}/{time}",
+            arguments = listOf(
+                navArgument("numOfWords") { type = NavType.IntType },
+                (navArgument("time") { type = NavType.IntType })
+            )
+        ) { backStackEntry ->
+            MixAndMatchScreen(
                 entryViewModel = entryViewModel,
                 navController = navController,
                 numOfWords = backStackEntry.arguments?.getInt("numOfWords")!!,

@@ -9,10 +9,7 @@ import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
-import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -38,8 +35,7 @@ import kotlin.collections.ArrayList
 import kotlin.random.Random
 import kotlin.random.nextInt
 
-//TODO remove the add entry FAB and remove cog
-// add back button that takes the user to games screen but first show a dialog to confirm
+// TODO add back button that takes the user to games screen but first show a dialog to confirm
 @Composable
 fun WordSearchScreen(
     entryViewModel: EntryViewModel,
@@ -107,7 +103,7 @@ fun createGrid(
     // 2d char array which first should be populated with words then filled out with random letters
     // from numbers array and turned to char
 
-
+    val backgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
 
     var colorStack = ArrayDeque<Int>()
 
@@ -145,7 +141,7 @@ fun createGrid(
     // map of coordinates
 
     numbers.forEachIndexed { index, value ->
-        colors[index] = Color.Gray;
+        colors[index] = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp);
     }
 
     val lazyListState = rememberLazyGridState()
@@ -176,7 +172,7 @@ fun createGrid(
                             isVertical = false
                             colorStack.clear()
                             numbers.forEachIndexed { index, value ->
-                                colors[index] = Color.Gray;
+                                colors[index] = backgroundColor;
                             }
                         },
                         onDrag = { change: PointerInputChange, dragAmount: Offset ->
@@ -202,7 +198,7 @@ fun createGrid(
                                         }
                                     }
                                     if (colors[index] == Color.Green) { // if the box that the finger is on was already green make the previous box gray
-                                        colors[colorStack.pop()] = Color.Gray
+                                        colors[colorStack.pop()] = backgroundColor
                                         break
                                     } else {
                                         if (isHorizontal) { // once the drag is horizontal ignore all of the vertical drag events
@@ -242,7 +238,7 @@ fun createGrid(
                                 width = coordinates.size.width
                                 height = coordinates.size.height
                             }
-                            .background(colors[index]!!) //TODO fix background color for boxes
+                            .background(colors[index]!!)
                             .fillMaxSize()
                     ) {
                         Text(

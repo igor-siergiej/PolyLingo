@@ -1,19 +1,31 @@
 package com.app.polylingo.ui.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Surface
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.app.polylingo.ui.components.scaffolds.MainScaffold
 import com.app.polylingo.R
+import com.app.polylingo.model.EntryViewModel
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(
+    navController: NavHostController,
+    entryViewModel: EntryViewModel
+) {
+    val entries by entryViewModel.entryList.observeAsState(mutableListOf())
 
     MainScaffold(
         navController = navController,
@@ -24,22 +36,71 @@ fun HomeScreen(navController: NavHostController) {
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            HomeScreenContent(
-                modifier = Modifier.padding(8.dp)
-            )
+            if (entries.isNotEmpty()) {
+                HomeScreenContent(
+                    modifier = Modifier.padding(8.dp),
+                    dictionaryWords = entries.size
+                )
+            }
+
         }
     }
 }
 
 @Composable
 private fun HomeScreenContent(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    dictionaryWords: Int
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp))
+        ) {
+            Text(
+                text = "Words in dictionary = $dictionaryWords",
+                modifier = Modifier.padding(vertical = 20.dp),
+                textAlign = TextAlign.Center,
+            )
+        }
 
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp))
+        ) {
+            Text(
+                text = "Words in dictionary = $dictionaryWords",
+                modifier = Modifier.padding(vertical = 20.dp),
+                textAlign = TextAlign.Center,
+            )
+        }
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp))
+        ) {
+            Text(
+                text = "Words in dictionary = $dictionaryWords",
+                modifier = Modifier.padding(vertical = 20.dp),
+                textAlign = TextAlign.Center,
+            )
+        }
     }
 }

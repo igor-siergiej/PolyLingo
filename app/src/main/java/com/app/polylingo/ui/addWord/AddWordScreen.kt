@@ -67,6 +67,7 @@ private fun AddWordScreenContent(
     var translatedWord by remember { mutableStateOf("") }
     var currentTextFieldError by remember { mutableStateOf(false) }
     var learningTextFieldError by remember { mutableStateOf(false) }
+
     var supportingText = stringResource(id = R.string.please_enter_word)
 
     Column(
@@ -126,7 +127,6 @@ private fun AddWordScreenContent(
                         learningTextFieldError = true
                     }
                     if (!currentTextFieldError && !learningTextFieldError && word != translatedWord) {
-                        // TODO test that the user cannot enter the same words
                         insertEntry(Entry(word,translatedWord))
                         navController.navigate(Screen.Dictionary.route) {
                             popUpTo(navController.graph.findStartDestination().id) {

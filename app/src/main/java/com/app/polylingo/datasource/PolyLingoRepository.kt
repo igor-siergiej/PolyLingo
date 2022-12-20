@@ -5,7 +5,6 @@ import com.app.polylingo.model.Entry
 
 class PolyLingoRepository(application: Application) {
     private val entryDao = PolyLingoRoomDatabase.getDatabase(application)!!.entryDao()
-    // TODO another val here for language and create get entry
 
     suspend fun insert(entry: Entry) {
         entryDao.insertSingleEntry(entry)

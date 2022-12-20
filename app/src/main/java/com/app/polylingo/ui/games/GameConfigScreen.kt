@@ -87,9 +87,7 @@ private fun GameConfigScreenContent(
                         gameNamesList[0] -> {
                             navController.navigate("${Screen.WordSearch.route}/${numOfWordsSliderPosition.toInt()}/${timeSliderPosition.toInt()}") {
                                 // this should be navigating without being able to go back
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
+                                popUpTo(Screen.Games.route)
                                 // Avoid multiple copies of the same destination when
                                 // reselecting the same item
                                 launchSingleTop = true
@@ -99,7 +97,15 @@ private fun GameConfigScreenContent(
                         }
 
                         gameNamesList[1] -> {
-                            Toast.makeText(context, gameNamesList[1], Toast.LENGTH_SHORT).show()
+                            navController.navigate("${Screen.MixAndMatch.route}/${numOfWordsSliderPosition.toInt()}/${timeSliderPosition.toInt()}") {
+                                // this should be navigating without being able to go back
+                                popUpTo(Screen.Games.route)
+                                // Avoid multiple copies of the same destination when
+                                // reselecting the same item
+                                launchSingleTop = true
+                                // Restore state when reselecting a previously selected item
+                                restoreState = true
+                            }
                         }
 
                         gameNamesList[2] -> {
