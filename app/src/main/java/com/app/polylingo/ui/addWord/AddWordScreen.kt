@@ -8,16 +8,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.app.polylingo.R
 import com.app.polylingo.datasource.fileStorage.LanguageViewModel
 import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFAB
+import com.app.polylingo.ui.games.GameConfigScreen
 import com.app.polylingo.ui.navigation.Screen
+import com.app.polylingo.ui.theme.PolyLingoTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -144,5 +149,18 @@ private fun AddWordScreenContent(
                 modifier = Modifier.padding(top = 15.dp, end = 15.dp)
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun AddWordScreenPreview() {
+    PolyLingoTheme(dynamicColor = false) {
+        //TODO REMOVE VIEW MODELS FROM THIS, CREATE ADD WORD SCREEN TOP LEVEL
+        var navController = rememberNavController()
+        var entryViewModel: EntryViewModel = viewModel()
+        var languageViewModel: LanguageViewModel = viewModel()
+        AddWordScreen(entryViewModel = entryViewModel, navController = navController,
+        languageViewModel = languageViewModel)
     }
 }

@@ -103,7 +103,21 @@ private fun BuildNavigationGraph(
                 languageViewModel
             )
         }
-        composable(Screen.WordSearch.route) { WordSearchScreen(navController) }
+
+        composable(
+            route = "${Screen.WordSearch.route}/{numOfWords}/{time}",
+            arguments = listOf(
+                navArgument("numOfWords") { type = NavType.IntType },
+                (navArgument("time") { type = NavType.IntType })
+            )
+        ) { backStackEntry ->
+            WordSearchScreen(
+                entryViewModel = entryViewModel,
+                navController = navController,
+                numOfWords = backStackEntry.arguments?.getInt("numOfWords")!!,
+                time = backStackEntry.arguments?.getInt("time")!!
+            )
+        }
 
         composable(
             route = "${Screen.GameConfigScreen.route}/{gameType}",

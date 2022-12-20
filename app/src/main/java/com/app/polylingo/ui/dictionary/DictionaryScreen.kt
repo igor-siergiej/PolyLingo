@@ -84,9 +84,10 @@ fun DictionaryScreenContent(
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 100.dp),
+            .padding(bottom = 75.dp),
         contentPadding = PaddingValues(10.dp),
     ) {
+        // TODO make this header clickable and sort when clicked alphabetically
         stickyHeader {
             Card(
                 border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline)
