@@ -21,6 +21,7 @@ import androidx.navigation.navArgument
 import com.app.polylingo.datasource.fileStorage.LanguageViewModel
 import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
+import com.app.polylingo.options.OptionsScreen
 import com.app.polylingo.ui.addWord.AddWordScreen
 import com.app.polylingo.ui.dictionary.DictionaryScreenTopLevel
 import com.app.polylingo.ui.games.GameConfigScreen
@@ -136,7 +137,7 @@ private fun BuildNavigationGraph(
         }
 
         composable(
-            route = "${Screen.GameConfigScreen.route}/{gameType}",
+            route = "${Screen.GameConfig.route}/{gameType}",
             arguments = listOf(
                 navArgument("gameType") { type = NavType.StringType },
             )
@@ -146,6 +147,8 @@ private fun BuildNavigationGraph(
                 gameType = backStackEntry.arguments?.getString("gameType")!!,
             )
         }
+
+        composable(Screen.Options.route) { OptionsScreen(navController) }
     }
 }
 

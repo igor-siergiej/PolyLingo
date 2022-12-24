@@ -73,7 +73,7 @@ private fun GamesScreenContent(
 }
 
 fun navigateToGamesConfigScreen(navController: NavHostController,  gameType: String) {
-    navController.navigate("${Screen.GameConfigScreen.route}/$gameType") {
+    navController.navigate("${Screen.GameConfig.route}/$gameType") {
         // this should be navigating without being able to go back
         popUpTo(Screen.Games.route)
         // Avoid multiple copies of the same destination when

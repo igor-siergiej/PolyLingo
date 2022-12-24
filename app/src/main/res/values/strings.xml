@@ -14,4 +14,8 @@
     <string name="please_enter_word">Please enter a word</string>
     <string name="add_word">Add new word</string>
     <string name="back">Back</string>
+    <string name="options">Options</string>
+    <string name="sound_volume">Sound Volume</string>
+    <string name="change_language">Change Language (Delete Dictionary)</string>
+    <string name="change">Change</string>
 </resources>

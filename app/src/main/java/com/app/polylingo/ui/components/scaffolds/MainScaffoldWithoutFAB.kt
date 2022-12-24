@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.app.polylingo.ui.components.MainBottomBar
 import com.app.polylingo.ui.components.MainTopBar
+import com.app.polylingo.ui.components.MainTopBarWithoutOptions
 import com.app.polylingo.ui.theme.PolyLingoTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -23,6 +24,23 @@ fun MainScaffoldWithoutFAB(
         },
         bottomBar = {
             MainBottomBar(navController)
+        },
+        content = { innerPadding ->
+            pageContent(innerPadding)
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainScaffoldWithoutFABAndOptions(
+    navController: NavHostController,
+    titleText: String,
+    pageContent: @Composable (innerPadding: PaddingValues) -> Unit = {}
+) {
+    Scaffold(
+        topBar = {
+            MainTopBarWithoutOptions(titleText,navController)
         },
         content = { innerPadding ->
             pageContent(innerPadding)

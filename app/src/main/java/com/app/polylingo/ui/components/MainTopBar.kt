@@ -17,6 +17,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.app.polylingo.R
 import com.app.polylingo.ui.components.scaffolds.LanguageScaffold
+import com.app.polylingo.ui.navigation.Screen
 import com.app.polylingo.ui.theme.PolyLingoTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,7 +33,17 @@ fun MainTopBar(
         ),
         actions = {
             FilledIconButton(
-                onClick = { Unit }/* here there should be an onclick to open the settings screen*/
+                onClick = {
+                    navController.navigate(Screen.Options.route) {
+                        // this should be navigating without being able to go back
+
+                        // Avoid multiple copies of the same destination when
+                        // reselecting the same item
+                        launchSingleTop = true
+                        // Restore state when reselecting a previously selected item
+                        restoreState = true
+                    }
+                }/* here there should be an onclick to open the settings screen*/
             ) {
                 Icon(
                     imageVector = Icons.Filled.Settings,
@@ -40,6 +51,31 @@ fun MainTopBar(
                 )
             }
         },
+        navigationIcon = {
+            FilledIconButton(
+                onClick = {
+                    navController.navigateUp()
+                }) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = stringResource(id = R.string.back)
+                )
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainTopBarWithoutOptions(
+    titleText: String,
+    navController: NavController
+) {
+    CenterAlignedTopAppBar(
+        title = { Text(titleText) },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
+        ),
         navigationIcon = {
             FilledIconButton(
                 onClick = {
