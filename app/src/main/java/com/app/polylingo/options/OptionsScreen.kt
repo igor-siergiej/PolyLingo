@@ -57,7 +57,10 @@ private fun OptionScreenContent(
             Text(text = stringResource(id = R.string.sound_volume))
         }
 
-        Slider(value = soundSliderPosition, onValueChange = { soundSliderPosition = it })
+        Slider(value = soundSliderPosition, onValueChange = {
+            soundSliderPosition = it
+            //TODO change volume sound
+        })
 
         Row(
             modifier = Modifier.fillMaxWidth(),

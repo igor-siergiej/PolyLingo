@@ -14,6 +14,10 @@ class PolyLingoRepository(application: Application) {
         entryDao.deleteEntry(entry)
     }
 
+    suspend fun removeAll() {
+        entryDao.deleteAll()
+    }
+
     suspend fun insertMultipleEntries(entries: MutableList<Entry>) {
         entryDao.insertMultipleEntries(entries)
     }// is this needed?

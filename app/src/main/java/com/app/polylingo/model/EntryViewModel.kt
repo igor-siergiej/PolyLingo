@@ -10,7 +10,7 @@ import com.app.polylingo.datasource.PolyLingoRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class EntryViewModel(application: Application) :AndroidViewModel(application) {
+class EntryViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: PolyLingoRepository = PolyLingoRepository(application)
 
     var entryList: LiveData<MutableList<Entry>> = repository.getAllEntries()
@@ -27,5 +27,11 @@ class EntryViewModel(application: Application) :AndroidViewModel(application) {
         }
     }
 
-    // search should be here
+    fun removeAll() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.removeAll()
+        }
+    }
+
+    // search should be here?
 }

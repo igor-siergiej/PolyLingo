@@ -60,15 +60,24 @@ private fun BuildNavigationGraph(
     // The NavController is in a place where all
     // our composables can access it.
     val navController = rememberNavController()
-    /*val coroutineScope = rememberCoroutineScope()
 
-     LaunchedEffect(key1 = Unit) {
-         coroutineScope.launch {
-             for (i in 5..50) {
-             entryViewModel.addEntry(Entry("word$i", "word$i"))
-         }
-         }
-     }*/
+    //testing word bank
+    /*val coroutineScope = rememberCoroutineScope()
+    LaunchedEffect(key1 = Unit) {
+        coroutineScope.launch {
+            entryViewModel.removeAll()
+            entryViewModel.addEntry(Entry("Mantequilla", "Butter"))
+            entryViewModel.addEntry(Entry("Cafe", "Coffee"))
+            entryViewModel.addEntry(Entry("Perro", "Dog"))
+            entryViewModel.addEntry(Entry("Gato", "Cat"))
+            entryViewModel.addEntry(Entry("Chaqueta", "Jacket"))
+            entryViewModel.addEntry(Entry("Marmelada", "Jam"))
+            entryViewModel.addEntry(Entry("Pan", "Bread"))
+            entryViewModel.addEntry(Entry("Hijo", "Son"))
+            entryViewModel.addEntry(Entry("Abuela", "Grandmother"))
+            entryViewModel.addEntry(Entry("Rojo", "Red"))
+        }
+    }*/
 
     // Each NavController is associated with a NavHost.
     // This links the NavController with a navigation graph.
@@ -84,7 +93,7 @@ private fun BuildNavigationGraph(
         navController = navController,
         startDestination = startingDestination
     ) {
-        composable(Screen.Home.route) { HomeScreen(navController,entryViewModel) }
+        composable(Screen.Home.route) { HomeScreen(navController, entryViewModel) }
 
         composable(Screen.Dictionary.route) {
             DictionaryScreenTopLevel(

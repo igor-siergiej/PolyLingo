@@ -9,11 +9,13 @@ import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerInputChange
@@ -30,6 +32,7 @@ import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.ui.components.scaffolds.MainScaffold
 import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFAB
+import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random
@@ -43,24 +46,17 @@ fun WordSearchScreen(
     numOfWords: Int,
     time: Int
 ) {
-    var words: List<Entry> = listOf()
+    var words: ArrayList<String> = remember { arrayListOf() }
+    val entryList by entryViewModel.entryList.observeAsState(mutableListOf())
 
-    val test by entryViewModel.entryList.observeAsState(mutableListOf())
-
-    var entries: MutableList<Entry>
-
-    if (test.isNotEmpty()) {
-        entries = entryViewModel.entryList.value!!
-        words = entries.asSequence().shuffled().take(numOfWords).toList().distinct()
+    if (entryList.isNotEmpty()) {
+        LaunchedEffect(Unit) {
+            var entries = entryList.asSequence().shuffled().take(numOfWords).toList().distinct()
+            entries.forEach { entry ->
+                words.add(entry.word)
+            }
+        }
     }
-
-    /*
-    val randomInts = generateSequence { Random.nextInt(1..69) }
-            .distinct()
-            .take(6)
-    */
-
-
 
     MainScaffoldWithoutFAB(
         navController = navController,
@@ -83,22 +79,19 @@ fun WordSearchScreen(
 @Composable
 private fun GamesScreenContent(
     modifier: Modifier = Modifier,
-    words: List<Entry>
+    words: ArrayList<String>
 ) {
     createGrid(words = words)
 }
 
 @Composable
 fun createGrid(
-    words: List<Entry>
+    words: ArrayList<String>
 ) {
-    val numOfCells = 40
-    val numbers =
-        List(numOfCells) { Random.nextInt(97, 122) } // ascii values for upper case alphabet
-    val letters = ArrayList<Char>()
-    for (number in numbers) {
-        letters.add(number.toChar())
-    }
+    val numOfCells = 99
+/*    val numbers =
+        List(numOfCells) { Random.nextInt(97, 122) } // ascii values for upper case alphabet*/
+
 
     // 2d char array which first should be populated with words then filled out with random letters
     // from numbers array and turned to char
@@ -117,14 +110,64 @@ fun createGrid(
     var isVertical = false
     var firstBox = Pair<Int, Int>(0, 0)
 
-    val numOfColumns = 4
+    val numOfColumns = 9
     val numOfRows = numOfCells / numOfColumns
 
-    val cells = List(numOfRows) { CharArray(numOfColumns) }
-    println(cells)
+    val cells = remember { List(numOfRows) { CharArray(numOfColumns) } }
+
+    if (words.isNotEmpty()) {
+        LaunchedEffect(key1 = Unit) {
+            var numAttempts = 0
+            //TODO if num attempts is reached, reset the grid and start again
+            while (++numAttempts < 100 && words.isNotEmpty()) {
+
+                val word = words.last()
+                val row = Random.nextInt(0, numOfRows)
+                val column = Random.nextInt(0, numOfColumns)
 
 
+                var columnLengthUntilBound = numOfColumns - column
+                var columnCellsAreEmpty = true
+                for (i in column until numOfColumns) {
+                    if (cells[row][i] != '\u0000') {
+                        columnCellsAreEmpty = false
+                        break
+                    }
+                }
+                if (columnLengthUntilBound >= word.length && columnCellsAreEmpty) { // if the word will fit
+                    //put the words in the grid
+                    for (i in word.indices) {
+                        cells[row][column + i] = word[i]
+                    }
+                    words.removeLast()
+                }
 
+                var rowLengthUntilBound = numOfRows - row
+                var rowCellsAreEmpty = true
+                for (i in row until numOfRows) {
+                    if (cells[i][column] != '\u0000') {
+                        rowCellsAreEmpty = false
+                        break
+                    }
+                }
+
+                if (rowLengthUntilBound >= word.length && rowCellsAreEmpty) { // if the word will fit
+                    //put the words in the grid
+                    for (i in word.indices) {
+                        cells[row + i][column] = word[i]
+                    }
+                    words.removeLast()
+                }
+            }
+        }
+    }
+
+
+    val letters = ArrayList<Char>()
+    for (charArray in cells) {
+        for (character in charArray)
+            letters.add(character)
+    }
 
     LaunchedEffect(Unit) {
         for (j in 1..numOfRows) {
@@ -134,19 +177,19 @@ fun createGrid(
         }
     }
 
-    val state = rememberDraggableState(
-        onDelta = { delta -> Log.d(ContentValues.TAG, "Dragged $delta") }
-    )
+// map of coordinates
 
-    // map of coordinates
-
-    numbers.forEachIndexed { index, value ->
+    letters.forEachIndexed { index, value ->
         colors[index] = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp);
     }
 
     val lazyListState = rememberLazyGridState()
 
-    Column(modifier = Modifier.fillMaxSize().padding(10.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp)
+    ) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(numOfColumns),
             state = lazyListState,
@@ -171,7 +214,7 @@ fun createGrid(
                             isHorizontal = false
                             isVertical = false
                             colorStack.clear()
-                            numbers.forEachIndexed { index, value ->
+                            letters.forEachIndexed { index, value ->
                                 colors[index] = backgroundColor;
                             }
                         },
@@ -252,24 +295,38 @@ fun createGrid(
                 }
             }
         )
-        Card(
+        Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp)
+                .padding(top = 5.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp))
         ) {
             LazyVerticalGrid(
-                modifier = Modifier.fillMaxWidth(),
-                columns = GridCells.Adaptive(80.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp),
+                columns = GridCells.Fixed(4),
                 content = {
-                    items(words) { item ->
-                        Text(
-                            text = item.word,
-                            modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
-                        )
+                    if (words.isNotEmpty()) {
+                        items(words) { item ->
+                            //TODO fix long words getting cut off
+                            Text(
+                                text = item,
+                                modifier = Modifier.padding(horizontal = 2.dp, vertical = 2.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
                 }
             )
         }
+        // SPACER
+
+        // TODO use time variable and every second set the progress to be percentage left
+        var progress by remember { mutableStateOf(1f) }
+        LinearProgressIndicator(progress = progress)
     }
 
 

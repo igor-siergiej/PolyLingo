@@ -126,6 +126,7 @@ private fun AddWordScreenContent(
                     if (translatedWord.isEmpty()) {
                         learningTextFieldError = true
                     }
+                    //TODO robustness: catch exception when word is already in the dictionary
                     if (!currentTextFieldError && !learningTextFieldError && word != translatedWord) {
                         insertEntry(Entry(word,translatedWord))
                         navController.navigate(Screen.Dictionary.route) {
