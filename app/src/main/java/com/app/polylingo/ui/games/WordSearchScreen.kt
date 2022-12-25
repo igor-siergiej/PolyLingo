@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,18 +47,6 @@ fun WordSearchScreen(
     numOfWords: Int,
     time: Int
 ) {
-    var words: ArrayList<String> = remember { arrayListOf() }
-    val entryList by entryViewModel.entryList.observeAsState(mutableListOf())
-
-    if (entryList.isNotEmpty()) {
-        LaunchedEffect(Unit) {
-            var entries = entryList.asSequence().shuffled().take(numOfWords).toList().distinct()
-            entries.forEach { entry ->
-                words.add(entry.word)
-            }
-        }
-    }
-
     MainScaffoldWithoutFAB(
         navController = navController,
         titleText = "$numOfWords $time"
@@ -70,24 +59,28 @@ fun WordSearchScreen(
         ) {
             GamesScreenContent(
                 modifier = Modifier.padding(8.dp),
-                words = words
+                entryViewModel = entryViewModel,
+                numOfWords = numOfWords,
+                time = time
             )
         }
     }
 }
 
 @Composable
-private fun GamesScreenContent(
-    modifier: Modifier = Modifier,
-    words: ArrayList<String>
+fun GamesScreenContent(
+    modifier: Modifier,
+    entryViewModel: EntryViewModel,
+    numOfWords: Int,
+    time: Int
 ) {
-    createGrid(words = words)
-}
+    val entries = remember {entryViewModel.entryList.value!!.asSequence().shuffled().take(numOfWords).toList().distinct()}
+    val words = mutableListOf<String>()
+    entries.forEach { entry ->
+        words.add(entry.word)
+    }
 
-@Composable
-fun createGrid(
-    words: ArrayList<String>
-) {
+
     val numOfCells = 99
 /*    val numbers =
         List(numOfCells) { Random.nextInt(97, 122) } // ascii values for upper case alphabet*/
@@ -115,13 +108,15 @@ fun createGrid(
 
     val cells = remember { List(numOfRows) { CharArray(numOfColumns) } }
 
-    if (words.isNotEmpty()) {
-        LaunchedEffect(key1 = Unit) {
+    var gridWords = words
+
+    if (gridWords.isNotEmpty()) {
+        LaunchedEffect(Unit) {
             var numAttempts = 0
             //TODO if num attempts is reached, reset the grid and start again
-            while (++numAttempts < 100 && words.isNotEmpty()) {
+            while (++numAttempts < 100 && gridWords.isNotEmpty()) {
 
-                val word = words.last()
+                val word = gridWords.last()
                 val row = Random.nextInt(0, numOfRows)
                 val column = Random.nextInt(0, numOfColumns)
 
@@ -139,7 +134,7 @@ fun createGrid(
                     for (i in word.indices) {
                         cells[row][column + i] = word[i]
                     }
-                    words.removeLast()
+                    gridWords.removeLast()
                 }
 
                 var rowLengthUntilBound = numOfRows - row
@@ -156,12 +151,11 @@ fun createGrid(
                     for (i in word.indices) {
                         cells[row + i][column] = word[i]
                     }
-                    words.removeLast()
+                    gridWords.removeLast()
                 }
             }
         }
     }
-
 
     val letters = ArrayList<Char>()
     for (charArray in cells) {
@@ -295,32 +289,33 @@ fun createGrid(
                 }
             }
         )
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 5.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp))
-        ) {
-            LazyVerticalGrid(
+        if (words.isNotEmpty()) {
+            Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(5.dp),
-                columns = GridCells.Fixed(4),
-                content = {
-                    if (words.isNotEmpty()) {
-                        items(words) { item ->
+                    .padding(top = 5.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp))
+            ) {
+                LazyVerticalGrid(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp),
+                    columns = GridCells.Fixed(4),
+                    content = {
+                        items(words) { word ->
                             //TODO fix long words getting cut off
                             Text(
-                                text = item,
+                                text = word,
                                 modifier = Modifier.padding(horizontal = 2.dp, vertical = 2.dp),
                                 textAlign = TextAlign.Center
                             )
+
                         }
                     }
-                }
-            )
+                )
+            }
         }
         // SPACER
 
