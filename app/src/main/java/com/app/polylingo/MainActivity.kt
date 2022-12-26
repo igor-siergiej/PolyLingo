@@ -7,11 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -19,7 +15,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.app.polylingo.datasource.fileStorage.LanguageViewModel
-import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.options.OptionsScreen
 import com.app.polylingo.ui.addWord.AddWordScreen
@@ -32,8 +27,6 @@ import com.app.polylingo.ui.home.HomeScreen
 import com.app.polylingo.ui.language.LanguageScreen
 import com.app.polylingo.ui.navigation.Screen
 import com.app.polylingo.ui.theme.PolyLingoTheme
-import kotlinx.coroutines.launch
-import java.io.File
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,7 +77,7 @@ private fun BuildNavigationGraph(
     // As we navigate between composables the content of
     // the NavHost is automatically recomposed.
     // Each composable destination in the graph is associated with a route.
-    var startingDestination = Screen.Language.route;
+    var startingDestination = Screen.Language.route
     if (languageViewModel.doesFileExist()) {
         startingDestination = Screen.Home.route
         languageViewModel.readLanguages()

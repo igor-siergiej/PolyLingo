@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.app.polylingo.R
 import com.app.polylingo.ui.components.scaffolds.MainScaffold
@@ -73,6 +72,8 @@ private fun GamesScreenContent(
 }
 
 fun navigateToGamesConfigScreen(navController: NavHostController,  gameType: String) {
+
+
     navController.navigate("${Screen.GameConfig.route}/$gameType") {
         // this should be navigating without being able to go back
         popUpTo(Screen.Games.route)

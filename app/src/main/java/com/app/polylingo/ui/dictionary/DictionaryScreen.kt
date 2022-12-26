@@ -31,9 +31,6 @@ import com.app.polylingo.datasource.fileStorage.LanguageViewModel
 import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.ui.components.scaffolds.MainScaffold
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
 fun DictionaryScreenTopLevel(
@@ -171,7 +168,7 @@ fun DictionaryScreenContent(
                         androidx.compose.material.FractionalThreshold(0.6f)
                     },
                     dismissContent = {
-                        entryCard(entry)
+                        EntryCard(entry)
                     },
                     directions = setOf(DismissDirection.EndToStart)
                 )
@@ -181,7 +178,7 @@ fun DictionaryScreenContent(
 }
 
 @Composable
-fun entryCard(entry: Entry) {
+fun EntryCard(entry: Entry) {
     OutlinedCard(
         shape = RectangleShape,
         colors = CardDefaults.cardColors(

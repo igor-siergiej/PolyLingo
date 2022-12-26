@@ -1,19 +1,14 @@
 package com.app.polylingo.ui.games
 
-import android.content.ContentValues
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
-import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,22 +17,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.app.polylingo.R
-import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
-import com.app.polylingo.ui.components.scaffolds.MainScaffold
 import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFAB
-import kotlinx.coroutines.launch
+import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFABAndOptions
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random
-import kotlin.random.nextInt
 
 // TODO add back button that takes the user to games screen but first show a dialog to confirm
 @Composable
@@ -47,7 +37,7 @@ fun WordSearchScreen(
     numOfWords: Int,
     time: Int
 ) {
-    MainScaffoldWithoutFAB(
+    MainScaffoldWithoutFABAndOptions(
         navController = navController,
         titleText = "$numOfWords $time"
         //titleText = stringArrayResource(id = R.array.game_names_list).toList()[0]
@@ -80,48 +70,39 @@ fun GamesScreenContent(
         words.add(entry.word)
     }
 
-
     val numOfCells = 99
-/*    val numbers =
-        List(numOfCells) { Random.nextInt(97, 122) } // ascii values for upper case alphabet*/
-
-
-    // 2d char array which first should be populated with words then filled out with random letters
-    // from numbers array and turned to char
 
     val backgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
 
-    var colorStack = ArrayDeque<Int>()
+    val colorStack = ArrayDeque<Int>()
 
     var width = 0
     var height = 0
 
-    var colors = remember { mutableStateMapOf<Int, Color>() }
-    var coords = remember { mutableListOf<Pair<Int, Int>>() }
+    val colors = remember { mutableStateMapOf<Int, Color>() }
+    val coords = remember { mutableListOf<Pair<Int, Int>>() }
 
     var isHorizontal = false
     var isVertical = false
-    var firstBox = Pair<Int, Int>(0, 0)
+    var firstBox = Pair(0, 0)
 
     val numOfColumns = 9
     val numOfRows = numOfCells / numOfColumns
 
     val cells = remember { List(numOfRows) { CharArray(numOfColumns) } }
 
-    var gridWords = words
-
-    if (gridWords.isNotEmpty()) {
+    if (words.isNotEmpty()) {
         LaunchedEffect(Unit) {
             var numAttempts = 0
             //TODO if num attempts is reached, reset the grid and start again
-            while (++numAttempts < 100 && gridWords.isNotEmpty()) {
+            while (++numAttempts < 100 && words.isNotEmpty()) {
 
-                val word = gridWords.last()
+                val word = words.last()
                 val row = Random.nextInt(0, numOfRows)
                 val column = Random.nextInt(0, numOfColumns)
 
 
-                var columnLengthUntilBound = numOfColumns - column
+                val columnLengthUntilBound = numOfColumns - column
                 var columnCellsAreEmpty = true
                 for (i in column until numOfColumns) {
                     if (cells[row][i] != '\u0000') {
@@ -134,10 +115,10 @@ fun GamesScreenContent(
                     for (i in word.indices) {
                         cells[row][column + i] = word[i]
                     }
-                    gridWords.removeLast()
+                    words.removeLast()
                 }
 
-                var rowLengthUntilBound = numOfRows - row
+                val rowLengthUntilBound = numOfRows - row
                 var rowCellsAreEmpty = true
                 for (i in row until numOfRows) {
                     if (cells[i][column] != '\u0000') {
@@ -151,9 +132,17 @@ fun GamesScreenContent(
                     for (i in word.indices) {
                         cells[row + i][column] = word[i]
                     }
-                    gridWords.removeLast()
+                    words.removeLast()
                 }
             }
+            for (i in 0 until numOfRows) {
+                for (j in 0 until numOfColumns) {
+                    if (cells[i][j] == '\u0000') {
+                        cells[i][j] = Random.nextInt(97, 122).toChar()
+                    }
+                }
+            }
+
         }
     }
 
@@ -173,14 +162,14 @@ fun GamesScreenContent(
 
 // map of coordinates
 
-    letters.forEachIndexed { index, value ->
-        colors[index] = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp);
+    letters.forEachIndexed { index, _ ->
+        colors[index] = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
     }
 
     val lazyListState = rememberLazyGridState()
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(10.dp)
     ) {
@@ -208,19 +197,19 @@ fun GamesScreenContent(
                             isHorizontal = false
                             isVertical = false
                             colorStack.clear()
-                            letters.forEachIndexed { index, value ->
-                                colors[index] = backgroundColor;
+                            letters.forEachIndexed { index, _ ->
+                                colors[index] = backgroundColor
                             }
                         },
-                        onDrag = { change: PointerInputChange, dragAmount: Offset ->
-                            var touchX = change.position.x
-                            var touchY = change.position.y
+                        onDrag = { change: PointerInputChange, _: Offset ->
+                            val touchX = change.position.x
+                            val touchY = change.position.y
 
                             for (index in 0 until coords.size) {
-                                var cellSizeX = coords[index].first
-                                var cellSizeY = coords[index].second
-                                var cellSizeBeforeX = cellSizeX - width
-                                var cellSizeBeforeY = cellSizeY - height
+                                val cellSizeX = coords[index].first
+                                val cellSizeY = coords[index].second
+                                val cellSizeBeforeX = cellSizeX - width
+                                val cellSizeBeforeY = cellSizeY - height
                                 if (touchX < cellSizeX && touchY < cellSizeY
                                     && touchX > cellSizeBeforeX && touchY > cellSizeBeforeY   // found the box the finger is on
                                 ) {
