@@ -1,5 +1,6 @@
 package com.app.polylingo.ui.games
 
+import android.os.CountDownTimer
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,9 +26,12 @@ import androidx.navigation.NavHostController
 import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFAB
 import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFABAndOptions
+import kotlinx.coroutines.delay
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.seconds
+
 
 // TODO add back button that takes the user to games screen but first show a dialog to confirm
 @Composable
@@ -300,18 +304,42 @@ fun GamesScreenContent(
                                 modifier = Modifier.padding(horizontal = 2.dp, vertical = 2.dp),
                                 textAlign = TextAlign.Center
                             )
-
                         }
                     }
                 )
             }
         }
-        // SPACER
-
-        // TODO use time variable and every second set the progress to be percentage left
-        var progress by remember { mutableStateOf(1f) }
-        LinearProgressIndicator(progress = progress)
+        Spacer(modifier = Modifier.height(10.dp))
+        createTimer(time)
     }
+}
 
+@Composable
+fun createTimer(time : Int) {
+    val errorColor = MaterialTheme.colorScheme.errorContainer
 
+    var color = ProgressIndicatorDefaults.linearColor
+    var indicatorColor = remember { mutableStateOf(color) }
+
+    // TODO use time variable and every second set the progress to be percentage left
+    var progress by remember { mutableStateOf(1f) }
+    LinearProgressIndicator(
+        modifier = Modifier.fillMaxWidth(),
+        progress = progress,
+        color = indicatorColor.value
+    )
+
+    val timer = object : CountDownTimer((time * 1000).toLong(), 75) {
+        override fun onTick(millisUntilFinished: Long) {
+            progress = millisUntilFinished/1000f/time
+        }
+
+        override fun onFinish() {
+            progress = 1f
+            indicatorColor.value = errorColor
+        }
+    }
+    LaunchedEffect(Unit) {
+        timer.start()
+    }
 }
