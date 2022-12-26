@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -15,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.app.polylingo.datasource.fileStorage.LanguageViewModel
+import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.options.OptionsScreen
 import com.app.polylingo.ui.addWord.AddWordScreen
@@ -27,6 +30,7 @@ import com.app.polylingo.ui.home.HomeScreen
 import com.app.polylingo.ui.language.LanguageScreen
 import com.app.polylingo.ui.navigation.Screen
 import com.app.polylingo.ui.theme.PolyLingoTheme
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,6 +73,9 @@ private fun BuildNavigationGraph(
             entryViewModel.addEntry(Entry("Hijo", "Son"))
             entryViewModel.addEntry(Entry("Abuela", "Grandmother"))
             entryViewModel.addEntry(Entry("Rojo", "Red"))
+            entryViewModel.addEntry(Entry("Negro", "Black"))
+            entryViewModel.addEntry(Entry("Verde", "Green"))
+            entryViewModel.addEntry(Entry("Hija", "Daughter"))
         }
     }*/
 

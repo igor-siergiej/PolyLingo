@@ -50,8 +50,8 @@ private fun GameConfigScreenContent(
     navController: NavHostController,
     gameType: String
 ) {
-    var numOfWordsSliderPosition by remember { mutableStateOf(4f) }
-    var timeSliderPosition by remember { mutableStateOf(30f) }
+    var numOfWordsSliderPosition by remember { mutableStateOf(3) }
+    var timeSliderPosition by remember { mutableStateOf(30) }
 
     val context = LocalContext.current
 
@@ -62,19 +62,19 @@ private fun GameConfigScreenContent(
         Text(text = "Number of words: $numOfWordsSliderPosition")
 
         Slider(
-            value = numOfWordsSliderPosition,
-            onValueChange = { numOfWordsSliderPosition = it },
-            valueRange = 4f..8f,
-            steps = 3
+            value = numOfWordsSliderPosition.toFloat(),
+            onValueChange = { numOfWordsSliderPosition = it.toInt() },
+            valueRange = 3f..12f,
+            steps = 2
         )
 
         Text(text = "Time to do test: $timeSliderPosition")
 
         Slider(
-            value = timeSliderPosition,
-            onValueChange = { timeSliderPosition = it },
+            value = timeSliderPosition.toFloat(),
+            onValueChange = { timeSliderPosition = it.toInt() },
             valueRange = 30f..120f,
-            steps = 4
+            steps = 2
         )
 
         Row(
