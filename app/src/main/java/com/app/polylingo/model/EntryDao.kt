@@ -22,4 +22,16 @@ interface EntryDao {
 
     @Query("SELECT * FROM entries")
     fun getAllEntries(): LiveData<MutableList<Entry>>
+
+    @Query("SELECT * " +
+            "FROM entries " +
+            " ORDER BY word ASC"
+            )
+    fun getAllEntriesSortedAsc(): MutableList<Entry>
+
+    @Query("SELECT * " +
+            "FROM entries " +
+            " ORDER BY word DESC"
+    )
+    fun getAllEntriesSortedDesc(): MutableList<Entry>
 }

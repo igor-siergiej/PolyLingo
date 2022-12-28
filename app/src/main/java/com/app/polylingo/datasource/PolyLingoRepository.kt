@@ -24,4 +24,8 @@ class PolyLingoRepository(application: Application) {
 
     fun getAllEntries() = entryDao.getAllEntries()
 
+    fun getSortedEntriesAsc() = entryDao.getAllEntriesSortedAsc()
+
+    fun getSortedEntriesDsc() = entryDao.getAllEntriesSortedDesc()
+
 }

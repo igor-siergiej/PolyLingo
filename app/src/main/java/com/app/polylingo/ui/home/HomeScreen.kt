@@ -25,7 +25,7 @@ fun HomeScreen(
     navController: NavHostController,
     entryViewModel: EntryViewModel
 ) {
-    val entries by entryViewModel.entryList.observeAsState(mutableListOf())
+    val entries by entryViewModel.entryList.observeAsState(listOf())
 
     MainScaffold(
         navController = navController,

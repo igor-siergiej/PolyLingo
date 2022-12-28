@@ -16,6 +16,7 @@ import com.app.polylingo.R
 import com.app.polylingo.ui.components.MainTopBar
 import com.app.polylingo.ui.components.scaffolds.MainScaffold
 import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFAB
+import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFABAndOptions
 import com.app.polylingo.ui.navigation.Screen
 import com.app.polylingo.ui.theme.PolyLingoTheme
 import kotlinx.coroutines.launch
@@ -25,8 +26,7 @@ fun GameConfigScreen(
     navController: NavHostController,
     gameType: String
 ) {
-
-    MainScaffoldWithoutFAB(
+    MainScaffoldWithoutFABAndOptions(
         navController = navController,
         titleText = "$gameType Config"
     ) { innerPadding ->

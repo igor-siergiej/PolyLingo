@@ -27,11 +27,27 @@ class EntryViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun removeAll() {
-        viewModelScope.launch(Dispatchers.IO) {
+    suspend fun removeAll() {
             repository.removeAll()
+    }
+
+    fun sortEntriesAsc() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val sortedList = repository.getSortedEntriesAsc()
+            removeAll()
+            sortedList.forEach{entry ->
+                addEntry(entry)
+            }
         }
     }
 
-    // search should be here?
+    fun sortEntriesDesc() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val sortedList = repository.getSortedEntriesDsc()
+            removeAll()
+            sortedList.forEach{entry ->
+                addEntry(entry)
+            }
+        }
+    }
 }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -69,8 +70,10 @@ fun WordSearchContent(
     numOfWords: Int,
     time: Int
 ) {
+    val test by entryViewModel.entryList.observeAsState(listOf())
+
     val entries = remember {
-        entryViewModel.entryList.value!!.asSequence().shuffled().take(numOfWords).toList()
+        test.asSequence().shuffled().take(numOfWords).toList()
             .distinct()
     }
     val words = mutableListOf<String>()
@@ -103,7 +106,6 @@ fun WordSearchContent(
             var numAttempts = 0
             var retries = 0
 
-            //TODO if num attempts is reached, reset the grid and start again
             while (++retries < 100) {
                 var gridWords: MutableList<String> = ArrayList()
                 gridWords.addAll(words)
@@ -237,6 +239,7 @@ fun WordSearchContent(
                         onDrag = { change: PointerInputChange, _: Offset ->
                             val touchX = change.position.x
                             val touchY = change.position.y
+                            //TODO when a new square is entered check the color stack if it contains any of the words
 
                             for (index in 0 until coords.size) {
                                 val cellSizeX = coords[index].first
@@ -327,7 +330,6 @@ fun WordSearchContent(
                     columns = GridCells.Fixed(3),
                     content = {
                         items(words) { word ->
-                            //TODO fix long words getting cut off
                             Text(
                                 text = word,
                                 textAlign = TextAlign.Center,

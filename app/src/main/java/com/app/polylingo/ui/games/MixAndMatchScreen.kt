@@ -23,13 +23,12 @@ fun MixAndMatchScreen(
 ) {
     var words: List<Entry> = listOf()
 
-    val test by entryViewModel.entryList.observeAsState(mutableListOf())
+    val test by entryViewModel.entryList.observeAsState(listOf())
 
     var entries: MutableList<Entry>
 
     if (test.isNotEmpty()) {
-        entries = entryViewModel.entryList.value!!
-        words = entries.asSequence().shuffled().take(numOfWords).toList().distinct()
+        words = test.asSequence().shuffled().take(numOfWords).toList().distinct()
     }
 
     /*
