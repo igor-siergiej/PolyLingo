@@ -96,22 +96,7 @@ fun WordSearchContent(
 
     val letters = remember { ArrayList<Char>() }
 
-    var entries = listOf<Entry>()
-    var iterations = 0
-    while (++iterations < 100) {
-        var words =
-            entryList!!.asSequence().shuffled().take(numOfWords).toList()
-                .distinct()
-        var isLonger = false
-        words.forEach{ word ->
-            if (word.word.length > numOfColumns || word.word.length > numOfRows) {
-                isLonger = true
-            }
-        }
-        if (!isLonger) {
-            entries = remember { words }
-        }
-    }
+    var entries = remember {getSortedEntries(entryList!!,numOfWords,numOfColumns,numOfRows)}
 
     val words = mutableListOf<String>()
     var isFound = mutableListOf<Boolean>()
@@ -119,7 +104,6 @@ fun WordSearchContent(
         words.add(entry.word)
         isFound.add(false)
     }
-
 
 
     var foundWordsIndex = remember { mutableListOf<Int>() }
@@ -139,8 +123,8 @@ fun WordSearchContent(
     var firstBox = Pair(0, 0)
 
 
-
     val cells = remember { List(numOfRows) { CharArray(numOfColumns) } }
+
 
     LaunchedEffect(Unit) {
         var numAttempts = 0
@@ -278,7 +262,7 @@ fun WordSearchContent(
                                 selection += colorStack.pop().second
                             }
                             selection = selection.reversed()
-                            words.forEachIndexed{index, word ->
+                            words.forEachIndexed { index, word ->
                                 if (selection == word) {
                                     isFound[index] = true
                                     foundWordsIndex.addAll(selectionIndex)
@@ -378,11 +362,64 @@ fun WordSearchContent(
                 }
             }
         )
+        var openDialog by remember { mutableStateOf(false)  }
 
         CreateWordGrid(words = words)
 
-        CreateTimer(time = time)
+        CreateTimer(time = time,
+        setOpenDialog = {
+            openDialog = true
+        })
+
+        if (openDialog) {
+            CreateDialog()
+        }
     }
+}
+
+fun getSortedEntries(entryList: List<Entry>, numOfWords: Int, numOfColumns: Int, numOfRows: Int): List<Entry> {
+    var iterations = 0
+    var returnList = listOf<Entry>()
+    while (++iterations < 100) {
+        var words =
+            entryList!!.asSequence().shuffled().take(numOfWords).toList()
+                .distinct()
+        var isLonger = false
+        words.forEach { word ->
+            if (word.word.length > numOfColumns || word.word.length > numOfRows) {
+                isLonger = true
+            }
+        }
+        if (!isLonger) {
+            returnList = words
+        }
+    }
+    return returnList
+}
+
+@Composable
+fun CreateDialog() {
+    AlertDialog(
+        onDismissRequest = {
+            // Dismiss the dialog when the user clicks outside the dialog or on the back
+            // button. If you want to disable that functionality, simply use an empty
+            // onCloseRequest.
+        },
+        title = {
+            Text(text = "Dialog Title")
+        },
+        text = {
+            Text("Here is a text ")
+        },
+        confirmButton = {
+            Button(
+
+                onClick = {
+                }) {
+                Text("This is the Confirm Button")
+            }
+        },
+    )
 }
 
 @Composable
@@ -417,7 +454,10 @@ fun CreateWordGrid(words: List<String>) {
 }
 
 @Composable
-fun CreateTimer(time: Int) {
+fun CreateTimer(
+    time: Int,
+    setOpenDialog: () -> Unit = {},
+) {
     val errorColor = MaterialTheme.colorScheme.errorContainer
 
     val color = ProgressIndicatorDefaults.linearColor
@@ -444,6 +484,7 @@ fun CreateTimer(time: Int) {
         override fun onFinish() {
             progress = 1f
             indicatorColor.value = errorColor
+            setOpenDialog()
         }
     }
     LaunchedEffect(Unit) {
