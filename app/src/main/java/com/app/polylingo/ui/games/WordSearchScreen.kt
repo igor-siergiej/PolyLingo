@@ -29,14 +29,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFABAndOptions
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random
 
-
-// TODO add back button that takes the user to games screen but first show a dialog to confirm
 @Composable
 fun WordSearchScreen(
     entryViewModel: EntryViewModel,
@@ -44,7 +43,7 @@ fun WordSearchScreen(
     numOfWords: Int,
     time: Int
 ) {
-    MainScaffoldWithoutFABAndOptions(
+    MainScaffoldWithoutFABAndOptions(// TODO create a game scaffold with a dialog for back button and help button and a help text parameter
         navController = navController,
         titleText = "$numOfWords $time"
         //titleText = stringArrayResource(id = R.array.game_names_list).toList()[0]
@@ -73,21 +72,57 @@ fun WordSearchContent(
 ) {
     val entryList = entryViewModel.entryList.value
 
+    var numOfCells = 0
+    var numOfColumns = 0
+    when (numOfWords) {
+        3 -> {
+            numOfCells = 35
+            numOfColumns = 6 //5
+        }
+        6 -> {
+            numOfCells = 49
+            numOfColumns = 7 //7
+        }
+        9 -> {
+            numOfCells = 72
+            numOfColumns = 8 //9
+        }
+        12 -> {
+            numOfCells = 99
+            numOfColumns = 9 //11
+        }
+    }
+    val numOfRows = numOfCells / numOfColumns
+
     val letters = remember { ArrayList<Char>() }
 
-    val entries = remember {
-        entryList!!.asSequence().shuffled().take(numOfWords).toList()
-            .distinct()
+    var entries = listOf<Entry>()
+    var iterations = 0
+    while (++iterations < 100) {
+        var words =
+            entryList!!.asSequence().shuffled().take(numOfWords).toList()
+                .distinct()
+        var isLonger = false
+        words.forEach{ word ->
+            if (word.word.length > numOfColumns || word.word.length > numOfRows) {
+                isLonger = true
+            }
+        }
+        if (!isLonger) {
+            entries = remember { words }
+        }
     }
-    var foundWordsIndex = remember { mutableListOf<Int>() }
+
     val words = mutableListOf<String>()
     var isFound = mutableListOf<Boolean>()
     entries.forEach { entry ->
         words.add(entry.word)
         isFound.add(false)
     }
-    val numOfCells = 99
-    // TODO switch based on number of entries changes the size of the grid
+
+
+
+    var foundWordsIndex = remember { mutableListOf<Int>() }
 
     val cellBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
 
@@ -103,8 +138,7 @@ fun WordSearchContent(
     var isVertical = false
     var firstBox = Pair(0, 0)
 
-    val numOfColumns = 9
-    val numOfRows = numOfCells / numOfColumns
+
 
     val cells = remember { List(numOfRows) { CharArray(numOfColumns) } }
 
@@ -234,7 +268,7 @@ fun WordSearchContent(
             )*/
 
                 .pointerInput(Unit) {
-                    detectDragGestures(
+                    detectDragGesturesAfterLongPress(
                         onDragStart = { println("DragStarted") },
                         onDragEnd = {
                             var selectionIndex = mutableListOf<Int>()
@@ -260,7 +294,7 @@ fun WordSearchContent(
                                 if (!foundWordsIndex.contains(index)) {
                                     colors[index] = cellBackgroundColor
                                 } else {
-                                    colors[index] = Color.Blue
+                                    colors[index] = Color.Blue// TODO find better colours
                                 }
                             }
                         },
