@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -70,21 +71,27 @@ fun WordSearchContent(
     numOfWords: Int,
     time: Int
 ) {
-    val test by entryViewModel.entryList.observeAsState(listOf())
+    val entryList = entryViewModel.entryList.value
+
+    val letters = remember { ArrayList<Char>() }
 
     val entries = remember {
-        test.asSequence().shuffled().take(numOfWords).toList()
+        entryList!!.asSequence().shuffled().take(numOfWords).toList()
             .distinct()
     }
+    var foundWordsIndex = remember { mutableListOf<Int>() }
     val words = mutableListOf<String>()
+    var isFound = mutableListOf<Boolean>()
     entries.forEach { entry ->
         words.add(entry.word)
+        isFound.add(false)
     }
     val numOfCells = 99
+    // TODO switch based on number of entries changes the size of the grid
 
-    val backgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
+    val cellBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
 
-    val colorStack = ArrayDeque<Int>()
+    val colorStack = ArrayDeque<Pair<Int, Char>>()
 
     var width = 0
     var height = 0
@@ -101,91 +108,92 @@ fun WordSearchContent(
 
     val cells = remember { List(numOfRows) { CharArray(numOfColumns) } }
 
-    if (words.isNotEmpty()) {
-        LaunchedEffect(Unit) {
-            var numAttempts = 0
-            var retries = 0
+    LaunchedEffect(Unit) {
+        var numAttempts = 0
+        var retries = 0
 
-            while (++retries < 100) {
-                var gridWords: MutableList<String> = ArrayList()
-                gridWords.addAll(words)
-                numAttempts = 0
-                println("retryNumber = $retries")
-                println("gridwords = $gridWords")
-                while (++numAttempts < 100 && gridWords.isNotEmpty()) {
+        while (++retries < 100) {
+            var gridWords: MutableList<String> = ArrayList()
+            gridWords.addAll(words)
+            numAttempts = 0
+            println("retryNumber = $retries")
+            println("gridwords = $gridWords")
+            while (++numAttempts < 100 && gridWords.isNotEmpty()) {
 
-                    val word = gridWords.last()
-                    val row = Random.nextInt(0, numOfRows)
-                    val column = Random.nextInt(0, numOfColumns)
+                val word = gridWords.last()
+                val row = Random.nextInt(0, numOfRows)
+                val column = Random.nextInt(0, numOfColumns)
 
-                    val columnLengthUntilBound = numOfColumns - column
-                    var columnCellsAreEmpty = true
-                    for (i in column until numOfColumns) {
-                        if (cells[row][i] != '\u0000') {
-                            columnCellsAreEmpty = false
-                            break
-                        }
-                    }
-                    if (columnLengthUntilBound >= word.length && columnCellsAreEmpty) { // if the word will fit
-                        //put the words in the grid
-                        for (i in word.indices) {
-                            cells[row][column + i] = word[i]
-                        }
-                        gridWords.removeLast()
-                    }
-                    val rowLengthUntilBound = numOfRows - row
-                    var rowCellsAreEmpty = true
-                    for (i in row until numOfRows) {
-                        if (cells[i][column] != '\u0000') {
-                            rowCellsAreEmpty = false
-                            break
-                        }
-                    }
-                    if (rowLengthUntilBound >= word.length && rowCellsAreEmpty) { // if the word will fit
-                        //put the words in the grid
-                        for (i in word.indices) {
-                            cells[row + i][column] = word[i]
-                        }
-                        gridWords.removeLast()
+                val columnLengthUntilBound = numOfColumns - column
+                var columnCellsAreEmpty = true
+                for (i in column until numOfColumns) {
+                    if (cells[row][i] != '\u0000') {
+                        columnCellsAreEmpty = false
+                        break
                     }
                 }
-                if (gridWords.isEmpty()) {
-                    println("Break out")
-                    break
+                if (columnLengthUntilBound >= word.length && columnCellsAreEmpty) { // if the word will fit
+                    //put the words in the grid
+                    for (i in word.indices) {
+                        cells[row][column + i] = word[i]
+                    }
+                    gridWords.removeLast()
                 }
-
-                if (numAttempts == 100) {
-                    println("NumberAttempts Reached!")
-                    println(gridWords)
-                }
-
-                //Clear Grid
-                for (i in 0 until numOfRows) {
-                    for (j in 0 until numOfColumns) {
-                        if (cells[i][j] != '\u0000') {
-                            cells[i][j] = '\u0000'
-                        }
+                val rowLengthUntilBound = numOfRows - row
+                var rowCellsAreEmpty = true
+                for (i in row until numOfRows) {
+                    if (cells[i][column] != '\u0000') {
+                        rowCellsAreEmpty = false
+                        break
                     }
                 }
-
+                if (rowLengthUntilBound >= word.length && rowCellsAreEmpty) { // if the word will fit
+                    //put the words in the grid
+                    for (i in word.indices) {
+                        cells[row + i][column] = word[i]
+                    }
+                    gridWords.removeLast()
+                }
             }
-            println("Retries failed")
+            if (gridWords.isEmpty()) {
+                println("Break out")
+                break
+            }
 
+            if (numAttempts == 100) {
+                println("NumberAttempts Reached!")
+                println(gridWords)
+            }
 
+            //Clear Grid
             for (i in 0 until numOfRows) {
                 for (j in 0 until numOfColumns) {
-                    if (cells[i][j] == '\u0000') {
-                        //cells[i][j] = Random.nextInt(97, 122).toChar()
+                    if (cells[i][j] != '\u0000') {
+                        cells[i][j] = '\u0000'
                     }
+                }
+            }
+
+        }
+        println("Retries failed")
+
+
+        for (i in 0 until numOfRows) {
+            for (j in 0 until numOfColumns) {
+                if (cells[i][j] == '\u0000') {
+                    //cells[i][j] = Random.nextInt(97, 122).toChar()
                 }
             }
         }
     }
 
-    val letters = ArrayList<Char>()
-    for (charArray in cells) {
-        for (character in charArray)
-            letters.add(character)
+    // need to create an empty grid first to get the size of the grid boxes
+    // but then need to clear to enter generated grid
+    letters.clear()
+    for (i in 0 until numOfRows) {
+        for (j in 0 until numOfColumns) {
+            letters.add(cells[i][j])
+        }
     }
 
     // map of coordinates
@@ -226,20 +234,39 @@ fun WordSearchContent(
             )*/
 
                 .pointerInput(Unit) {
-                    detectDragGesturesAfterLongPress(
+                    detectDragGestures(
                         onDragStart = { println("DragStarted") },
                         onDragEnd = {
+                            var selectionIndex = mutableListOf<Int>()
+                            var selection = ""
+                            while (colorStack.peek() != null) {
+                                selectionIndex.add(colorStack.peek().first)
+                                selection += colorStack.pop().second
+                            }
+                            selection = selection.reversed()
+                            words.forEachIndexed{index, word ->
+                                if (selection == word) {
+                                    isFound[index] = true
+                                    foundWordsIndex.addAll(selectionIndex)
+                                }
+                            }
+                            println(selection)
+
+                            // reset grid
                             isHorizontal = false
                             isVertical = false
                             colorStack.clear()
                             letters.forEachIndexed { index, _ ->
-                                colors[index] = backgroundColor
+                                if (!foundWordsIndex.contains(index)) {
+                                    colors[index] = cellBackgroundColor
+                                } else {
+                                    colors[index] = Color.Blue
+                                }
                             }
                         },
                         onDrag = { change: PointerInputChange, _: Offset ->
                             val touchX = change.position.x
                             val touchY = change.position.y
-                            //TODO when a new square is entered check the color stack if it contains any of the words
 
                             for (index in 0 until coords.size) {
                                 val cellSizeX = coords[index].first
@@ -249,8 +276,11 @@ fun WordSearchContent(
                                 if (touchX < cellSizeX && touchY < cellSizeY
                                     && touchX > cellSizeBeforeX && touchY > cellSizeBeforeY   // found the box the finger is on
                                 ) {
-                                    if (colorStack.peek() == index) {
-                                        break
+                                    var peek = colorStack.peek()
+                                    if (peek != null) {
+                                        if (colorStack.peek().first == index) {
+                                            break
+                                        }
                                     }
                                     if (colorStack.size == 1) { // second box is pressed, this will determine if it's going to be horizontal or vertical
                                         if (firstBox.first == coords[index].first) {
@@ -260,7 +290,7 @@ fun WordSearchContent(
                                         }
                                     }
                                     if (colors[index] == Color.Green) { // if the box that the finger is on was already green make the previous box gray
-                                        colors[colorStack.pop()] = backgroundColor
+                                        colors[colorStack.pop().first] = cellBackgroundColor
                                         break
                                     } else {
                                         if (isHorizontal) { // once the drag is horizontal ignore all of the vertical drag events
@@ -268,18 +298,18 @@ fun WordSearchContent(
                                                 break
                                             } else {
                                                 colors[index] = Color.Green
-                                                colorStack.push(index)
+                                                colorStack.push(index to letters[index])
                                             }
                                         } else if (isVertical) { // same as above just for vertical
                                             if (firstBox.first != coords[index].first) {
                                                 break
                                             } else {
                                                 colors[index] = Color.Green
-                                                colorStack.push(index)
+                                                colorStack.push(index to letters[index])
                                             }
                                         } else { // first box will be highlighted before the drag has direction
                                             colors[index] = Color.Green
-                                            colorStack.push(index)
+                                            colorStack.push(index to letters[index])
                                             if (colorStack.size == 1) {// the first box that is pressed
                                                 firstBox = coords[index]
                                             }
@@ -315,34 +345,41 @@ fun WordSearchContent(
             }
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
-        if (words.isNotEmpty()) {
-            Box(
-                contentAlignment = Alignment.Center,
+        CreateWordGrid(words = words)
+
+        CreateTimer(time = time)
+    }
+}
+
+@Composable
+fun CreateWordGrid(words: List<String>) {
+    Spacer(modifier = Modifier.height(10.dp))
+    if (words.isNotEmpty()) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(10.dp))
+                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp))
+        ) {
+            LazyVerticalGrid(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp))
-            ) {
-                LazyVerticalGrid(
-                    modifier = Modifier
-                        .fillMaxWidth().padding(5.dp),
-                    columns = GridCells.Fixed(3),
-                    content = {
-                        items(words) { word ->
-                            Text(
-                                text = word,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(vertical = 2.dp)
-                            )
-                        }
+                    .padding(5.dp),
+                columns = GridCells.Fixed(3),
+                content = {
+                    items(words) { word ->
+                        Text(
+                            text = word,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(vertical = 2.dp)
+                        )
                     }
-                )
-            }
+                }
+            )
         }
-        Spacer(modifier = Modifier.height(20.dp))
-        CreateTimer(time)
     }
+    Spacer(modifier = Modifier.height(20.dp))
 }
 
 @Composable

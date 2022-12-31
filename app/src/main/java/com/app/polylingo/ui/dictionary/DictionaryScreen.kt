@@ -87,9 +87,7 @@ fun DictionaryScreen(
             ) {
                 stickyHeader {
                     Card(
-                        //TODO FIX THIS SORTING
                         modifier = Modifier.clickable {
-                            // not composable function so won't recompose?
                             if (sorted == false) {
                                 sortAsc()
                                 sorted = true
@@ -110,6 +108,8 @@ fun DictionaryScreen(
                                 modifier = Modifier
                                     .weight(1f)
                                     .padding(vertical = 20.dp)
+                            // TODO sorting should be able to be done for both word and translated word
+                            //  make each text clickable and add sorting methods for translated word
                             )
 
                             Divider(

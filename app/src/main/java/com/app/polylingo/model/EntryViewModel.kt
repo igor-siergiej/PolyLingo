@@ -31,6 +31,7 @@ class EntryViewModel(application: Application) : AndroidViewModel(application) {
             repository.removeAll()
     }
 
+    // TODO these methods should also include being able to sort by translated word too
     fun sortEntriesAsc() {
         viewModelScope.launch(Dispatchers.IO) {
             val sortedList = repository.getSortedEntriesAsc()
