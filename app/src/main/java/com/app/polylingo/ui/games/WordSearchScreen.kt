@@ -30,6 +30,7 @@ import androidx.navigation.NavHostController
 import com.app.polylingo.R
 import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
+import com.app.polylingo.ui.components.scaffolds.GameScaffold
 import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFABAndOptions
 import com.app.polylingo.ui.navigation.Screen
 import java.util.*
@@ -43,9 +44,10 @@ fun WordSearchScreen(
     numOfWords: Int,
     time: Int
 ) {
-    MainScaffoldWithoutFABAndOptions(// TODO create a game scaffold with a dialog for back button and help button and a help text parameter
+    GameScaffold(
         navController = navController,
-        titleText = "$numOfWords $time"
+        titleText = "$numOfWords $time",
+        tipText = stringResource(id = R.string.word_search_tip)
         //titleText = stringArrayResource(id = R.array.game_names_list).toList()[0]
     ) { innerPadding ->
         Surface(
@@ -238,7 +240,8 @@ fun WordSearchContent(
                 stringResource(R.string.congratulations),
                 stringResource(R.string.completed_game),
                 Screen.Home,
-                navController
+                navController,
+                false
             )
         }
 
@@ -247,7 +250,8 @@ fun WordSearchContent(
                 stringResource(R.string.out_of_time),
                 stringResource(R.string.better_luck),
                 Screen.Games,
-                navController
+                navController,
+                true
             )
         }
     }
@@ -262,9 +266,7 @@ fun CreateGrid(
     isFound: MutableList<Boolean>,
     setOpenDialog: () -> Unit = {}
 ) {
-
     val cellBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
-
 
     val colors = remember { mutableStateMapOf<Int, Color>() }
     letters.forEachIndexed { index, _ ->
@@ -272,8 +274,6 @@ fun CreateGrid(
             colors[index] = cellBackgroundColor
         }
     }
-
-
 
     val foundWordsIndex = remember { mutableListOf<Int>() }
 
@@ -468,21 +468,33 @@ fun getSortedEntries(
     return returnList
 }
 
+//TODO create a "Try again" button here so that user can restart game instead of having to get to the game again
+//TODO create two methods instead
 @Composable
 fun CreateDialog(
     title: String,
     text: String,
     screen: Screen,
-    navController: NavHostController
-) { // TODO make this reusable for both winning and losing dialog with a screen parameter
+    navController: NavHostController,
+    isErrorDialog: Boolean
+) {
     AlertDialog(
         onDismissRequest = {
         },
         title = {
-            Text(text = title)
+            if (isErrorDialog) {
+                Text(text = title, color = Color.Red)
+            } else {
+                Text(text = title)
+            }
+
         },
         text = {
-            Text(text)
+            if (isErrorDialog) {
+                Text(text = text, color = Color.Red)
+            } else {
+                Text(text = text)
+            }
         },
         confirmButton = {
             Button(
@@ -545,8 +557,6 @@ fun CreateTimer(
     time: Int,
     setOpenDialog: () -> Unit = {},
 ) {
-    val errorColor = MaterialTheme.colorScheme.errorContainer
-
     val color = ProgressIndicatorDefaults.linearColor
     val indicatorColor = remember { mutableStateOf(color) }
 
@@ -570,7 +580,7 @@ fun CreateTimer(
 
         override fun onFinish() {
             progress = 1f
-            indicatorColor.value = errorColor
+            indicatorColor.value = Color.Red
             setOpenDialog()
         }
     }

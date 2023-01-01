@@ -72,7 +72,8 @@ private fun GamesScreenContent(
 }
 
 fun navigateToGamesConfigScreen(navController: NavHostController,  gameType: String) {
-
+ //TODO if no entries in dictionary then create dialog to navigate to dictionary to add words
+    // minimum words = 3?
 
     navController.navigate("${Screen.GameConfig.route}/$gameType") {
         // this should be navigating without being able to go back

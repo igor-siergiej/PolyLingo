@@ -83,6 +83,7 @@ private fun GameConfigScreenContent(
         ) {
             Button(
                 onClick = {
+                    // TODO check that the number of entries allows to play a game with a certain amount of words
                     when (gameType) {
                         gameNamesList[0] -> {
                             navController.navigate("${Screen.WordSearch.route}/${numOfWordsSliderPosition.toInt()}/${timeSliderPosition.toInt()}") {

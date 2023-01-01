@@ -4,10 +4,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -90,11 +93,81 @@ fun MainTopBarWithoutOptions(
     )
 }
 
+//TODO should probably be in its own file
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GameTopBar(
+    titleText: String,
+    tipText: String,
+    navController: NavController
+) {
+    var openDialog by remember { mutableStateOf(false)  }
+    if (openDialog) {
+        CreateTipDialog(tipText = tipText, setCloseDialog = {openDialog = false})
+    }
+    CenterAlignedTopAppBar(
+        title = { Text(titleText) },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
+        ),
+        navigationIcon = {
+            FilledIconButton(
+                onClick = {
+                    // Create alert dialog if the user is sure they want to exit
+                    navController.navigateUp()
+                }) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = stringResource(id = R.string.back)
+                )
+            }
+        },
+        actions = {
+            FilledIconButton(
+                onClick = {
+                    openDialog = true
+                    // Create alert dialog with help tips
+                }) {
+                Icon(
+                    imageVector = Icons.Filled.HelpOutline,
+                    contentDescription = stringResource(id = R.string.help)
+                )
+            }
+        }
+    )
+}
+
+//Todo probably should be in separate file
+@Composable
+fun CreateTipDialog(
+    tipText: String,
+    setCloseDialog: () -> Unit = {}
+) {
+    AlertDialog(
+        onDismissRequest = {
+        },
+        title = {
+            Text(text = stringResource(id = R.string.hint))
+        },
+        text = {
+            Text(text = tipText)
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    setCloseDialog()
+                }) {
+                Text(stringResource(id = R.string.confirm))
+            }
+        },
+    )
+}
+
 @Preview
 @Composable
 private fun MainTopBarPreview() {
     PolyLingoTheme(dynamicColor = false) {
         var navController = rememberNavController()
-        MainTopBar(titleText = "Test", navController)
+        GameTopBar(titleText = "Test","tt" ,navController)
     }
 }

@@ -23,4 +23,9 @@
     <string name="completed_game">You completed this test in time.</string>
     <string name="out_of_time">You\'re out of time!</string>
     <string name="better_luck">Better luck next time.</string>
+    <string name="help">Help</string>
+    <string name="word_search_tip">Press and hold the grid to start selecting the letters</string>
+    <string name="tip">Tip</string>
+    <string name="hint">Here\'s a Hint!</string>
+    <string name="confirm">Got it!</string>
 </resources>

@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.app.polylingo.ui.components.GameTopBar
 import com.app.polylingo.ui.components.MainBottomBar
 import com.app.polylingo.ui.components.MainTopBar
 import com.app.polylingo.ui.components.MainTopBarWithoutOptions
@@ -41,6 +42,24 @@ fun MainScaffoldWithoutFABAndOptions(
     Scaffold(
         topBar = {
             MainTopBarWithoutOptions(titleText,navController)
+        },
+        content = { innerPadding ->
+            pageContent(innerPadding)
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GameScaffold(
+    navController: NavHostController,
+    titleText: String,
+    tipText: String,
+    pageContent: @Composable (innerPadding: PaddingValues) -> Unit = {}
+) {
+    Scaffold(
+        topBar = {
+            GameTopBar(titleText,tipText,navController)
         },
         content = { innerPadding ->
             pageContent(innerPadding)
