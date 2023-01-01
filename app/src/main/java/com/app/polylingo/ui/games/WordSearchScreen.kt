@@ -5,33 +5,33 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.app.polylingo.R
 import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFABAndOptions
+import com.app.polylingo.ui.navigation.Screen
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random
@@ -57,7 +57,8 @@ fun WordSearchScreen(
                 modifier = Modifier.padding(8.dp),
                 entryViewModel = entryViewModel,
                 numOfWords = numOfWords,
-                time = time
+                time = time,
+                navController = navController
             )
         }
     }
@@ -68,7 +69,8 @@ fun WordSearchContent(
     modifier: Modifier,
     entryViewModel: EntryViewModel,
     numOfWords: Int,
-    time: Int
+    time: Int,
+    navController: NavHostController
 ) {
     val entryList = entryViewModel.entryList.value
 
@@ -96,31 +98,26 @@ fun WordSearchContent(
 
     val letters = remember { ArrayList<Char>() }
 
-    var entries = remember {getSortedEntries(entryList!!,numOfWords,numOfColumns,numOfRows)}
+    val entries = remember { getSortedEntries(entryList!!, numOfWords, numOfColumns, numOfRows) }
 
     val words = mutableListOf<String>()
-    var isFound = mutableListOf<Boolean>()
+    var isFound = remember { mutableStateListOf<Boolean>() }
+    if (isFound.isEmpty()) {
+        for (i in 0 until numOfWords) {
+            isFound.add(false)
+        }
+    }
+
     entries.forEach { entry ->
         words.add(entry.word)
-        isFound.add(false)
     }
 
 
-    var foundWordsIndex = remember { mutableListOf<Int>() }
 
-    val cellBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
 
-    val colorStack = ArrayDeque<Pair<Int, Char>>()
 
-    var width = 0
-    var height = 0
-
-    val colors = remember { mutableStateMapOf<Int, Color>() }
-    val coords = remember { mutableListOf<Pair<Int, Int>>() }
-
-    var isHorizontal = false
-    var isVertical = false
-    var firstBox = Pair(0, 0)
+    var openOutOfTimeDialog by remember { mutableStateOf(false) }
+    var openCompletedDialog by remember { mutableStateOf(false) }
 
 
     val cells = remember { List(numOfRows) { CharArray(numOfColumns) } }
@@ -131,7 +128,7 @@ fun WordSearchContent(
         var retries = 0
 
         while (++retries < 100) {
-            var gridWords: MutableList<String> = ArrayList()
+            val gridWords: MutableList<String> = ArrayList()
             gridWords.addAll(words)
             numAttempts = 0
             println("retryNumber = $retries")
@@ -191,7 +188,6 @@ fun WordSearchContent(
                     }
                 }
             }
-
         }
         println("Retries failed")
 
@@ -215,174 +211,249 @@ fun WordSearchContent(
     }
 
     // map of coordinates
-    LaunchedEffect(Unit) {
-        for (j in 1..numOfRows) {
-            for (i in 1..numOfColumns) {
-                coords.add(width * i to height * j)
-            }
-        }
-    }
 
-    letters.forEachIndexed { index, _ ->
-        colors[index] = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
-    }
 
-    val lazyListState = rememberLazyGridState()
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(10.dp)
     ) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(numOfColumns),
-            state = lazyListState,
-            modifier = Modifier
-                /*.draggable(
-                    state = state,
-                    orientation = Orientation.Vertical,
-                    onDragStarted = { Log.d(TAG, "Vertical Drag started") },
-                    onDragStopped = { Log.d(TAG, "Vertical Drag ended") }
-                )
-                .draggable(
-                state = state,
-                orientation = Orientation.Horizontal,
-                onDragStarted = { Log.d(TAG, "Horizontal Drag started") },
-                onDragStopped = { Log.d(TAG, "Horizontal Drag ended") }
-            )*/
 
-                .pointerInput(Unit) {
-                    detectDragGesturesAfterLongPress(
-                        onDragStart = { println("DragStarted") },
-                        onDragEnd = {
-                            var selectionIndex = mutableListOf<Int>()
-                            var selection = ""
-                            while (colorStack.peek() != null) {
-                                selectionIndex.add(colorStack.peek().first)
-                                selection += colorStack.pop().second
-                            }
-                            selection = selection.reversed()
-                            words.forEachIndexed { index, word ->
-                                if (selection == word) {
-                                    isFound[index] = true
-                                    foundWordsIndex.addAll(selectionIndex)
-                                }
-                            }
-                            println(selection)
-
-                            // reset grid
-                            isHorizontal = false
-                            isVertical = false
-                            colorStack.clear()
-                            letters.forEachIndexed { index, _ ->
-                                if (!foundWordsIndex.contains(index)) {
-                                    colors[index] = cellBackgroundColor
-                                } else {
-                                    colors[index] = Color.Blue// TODO find better colours
-                                }
-                            }
-                        },
-                        onDrag = { change: PointerInputChange, _: Offset ->
-                            val touchX = change.position.x
-                            val touchY = change.position.y
-
-                            for (index in 0 until coords.size) {
-                                val cellSizeX = coords[index].first
-                                val cellSizeY = coords[index].second
-                                val cellSizeBeforeX = cellSizeX - width
-                                val cellSizeBeforeY = cellSizeY - height
-                                if (touchX < cellSizeX && touchY < cellSizeY
-                                    && touchX > cellSizeBeforeX && touchY > cellSizeBeforeY   // found the box the finger is on
-                                ) {
-                                    var peek = colorStack.peek()
-                                    if (peek != null) {
-                                        if (colorStack.peek().first == index) {
-                                            break
-                                        }
-                                    }
-                                    if (colorStack.size == 1) { // second box is pressed, this will determine if it's going to be horizontal or vertical
-                                        if (firstBox.first == coords[index].first) {
-                                            isVertical = true
-                                        } else {
-                                            isHorizontal = true
-                                        }
-                                    }
-                                    if (colors[index] == Color.Green) { // if the box that the finger is on was already green make the previous box gray
-                                        colors[colorStack.pop().first] = cellBackgroundColor
-                                        break
-                                    } else {
-                                        if (isHorizontal) { // once the drag is horizontal ignore all of the vertical drag events
-                                            if (firstBox.second != coords[index].second) {
-                                                break
-                                            } else {
-                                                colors[index] = Color.Green
-                                                colorStack.push(index to letters[index])
-                                            }
-                                        } else if (isVertical) { // same as above just for vertical
-                                            if (firstBox.first != coords[index].first) {
-                                                break
-                                            } else {
-                                                colors[index] = Color.Green
-                                                colorStack.push(index to letters[index])
-                                            }
-                                        } else { // first box will be highlighted before the drag has direction
-                                            colors[index] = Color.Green
-                                            colorStack.push(index to letters[index])
-                                            if (colorStack.size == 1) {// the first box that is pressed
-                                                firstBox = coords[index]
-                                            }
-                                        }
-                                        break
-                                    }
-                                }
-                            }
-                        }
-                    )
-                },
-            content = {
-                items(letters.size) { index ->
-                    Box(
-                        modifier = Modifier
-                            .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline))
-                            .onGloballyPositioned { coordinates ->
-                                width = coordinates.size.width
-                                height = coordinates.size.height
-                            }
-                            .background(colors[index]!!)
-                            .fillMaxSize()
-                    ) {
-                        Text(
-                            text = letters[index].toString().uppercase(Locale.ROOT),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 30.sp,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    }
-                }
+        CreateGrid(numOfColumns, numOfRows, words, letters, isFound,
+            setOpenDialog = {
+                openCompletedDialog = true
             }
         )
-        var openDialog by remember { mutableStateOf(false)  }
 
-        CreateWordGrid(words = words)
+        CreateWordGrid(words = words, isFound = isFound)
 
         CreateTimer(time = time,
-        setOpenDialog = {
-            openDialog = true
-        })
+            setOpenDialog = {
+                openOutOfTimeDialog = true
+            })
 
-        if (openDialog) {
-            CreateDialog()
+        if (openCompletedDialog) {
+            CreateDialog(
+                stringResource(R.string.congratulations),
+                stringResource(R.string.completed_game),
+                Screen.Home,
+                navController
+            )
+        }
+
+        if (openOutOfTimeDialog) {
+            CreateDialog(
+                stringResource(R.string.out_of_time),
+                stringResource(R.string.better_luck),
+                Screen.Games,
+                navController
+            )
         }
     }
 }
 
-fun getSortedEntries(entryList: List<Entry>, numOfWords: Int, numOfColumns: Int, numOfRows: Int): List<Entry> {
+@Composable
+fun CreateGrid(
+    numOfColumns: Int,
+    numOfRows: Int,
+    words: List<String>,
+    letters: List<Char>,
+    isFound: MutableList<Boolean>,
+    setOpenDialog: () -> Unit = {}
+) {
+
+    val cellBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
+
+
+    val colors = remember { mutableStateMapOf<Int, Color>() }
+    letters.forEachIndexed { index, _ ->
+        if (colors[index] == null) {
+            colors[index] = cellBackgroundColor
+        }
+    }
+
+
+
+    val foundWordsIndex = remember { mutableListOf<Int>() }
+
+    var width = remember { mutableListOf(0) }
+    var height = remember { mutableListOf(0) }
+
+    val coords = remember { mutableListOf<Pair<Int, Int>>() }
+
+
+    coords.clear()
+    for (j in 1..numOfRows) {
+        for (i in 1..numOfColumns) {
+            coords.add(width[0] * i to height[0] * j)
+        }
+    }
+
+
+    val colorStack = ArrayDeque<Pair<Int, Char>>()
+
+    val lazyListState = rememberLazyGridState()
+    var isHorizontal = false
+    var isVertical = false
+    var firstBox = Pair(0, 0)
+
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(numOfColumns),
+        state = lazyListState,
+        modifier = Modifier
+            /*.draggable(
+                state = state,
+                orientation = Orientation.Vertical,
+                onDragStarted = { Log.d(TAG, "Vertical Drag started") },
+                onDragStopped = { Log.d(TAG, "Vertical Drag ended") }
+            )
+            .draggable(
+            state = state,
+            orientation = Orientation.Horizontal,
+            onDragStarted = { Log.d(TAG, "Horizontal Drag started") },
+            onDragStopped = { Log.d(TAG, "Horizontal Drag ended") }
+        )*/
+
+            .pointerInput(Unit) {
+                detectDragGesturesAfterLongPress(
+                    onDragStart = { println("DragStarted") },
+                    onDragEnd = {
+
+                        val selectionIndex = mutableListOf<Int>()
+                        var selection = ""
+                        while (colorStack.peek() != null) {
+                            selectionIndex.add(colorStack.peek().first)
+                            selection += colorStack.pop().second
+                        }
+                        selection = selection.reversed()
+
+                        words.forEachIndexed { index, word ->
+                            if (selection == word) {
+                                isFound[index] = true
+                                foundWordsIndex.addAll(selectionIndex)
+                            }
+                        }
+
+                        letters.forEachIndexed { index, _ ->
+                            if (!foundWordsIndex.contains(index)) {
+                                colors[index] = cellBackgroundColor
+                            } else {
+                                colors[index] = Color.Blue// TODO find better colours
+                            }
+                        }
+
+                        var areAllFound = true
+                        isFound.forEach { isFound ->
+                            if (!isFound) {
+                                areAllFound = false
+                            }
+                        }
+
+                        if (areAllFound) {
+                            setOpenDialog()
+                        }
+
+                        // reset grid
+                        isHorizontal = false
+                        isVertical = false
+                        colorStack.clear()
+
+                    },
+                    onDrag = { change: PointerInputChange, _: Offset ->
+                        val touchX = change.position.x
+                        val touchY = change.position.y
+
+                        for (index in 0 until coords.size) {
+                            val cellSizeX = coords[index].first
+                            val cellSizeY = coords[index].second
+                            val cellSizeBeforeX = cellSizeX - width[0]
+                            val cellSizeBeforeY = cellSizeY - height[0]
+                            if (touchX < cellSizeX && touchY < cellSizeY
+                                && touchX > cellSizeBeforeX && touchY > cellSizeBeforeY   // found the box the finger is on
+                            ) {
+                                val peek = colorStack.peek()
+                                if (peek != null) {
+                                    if (colorStack.peek().first == index) {
+                                        break
+                                    }
+                                }
+                                if (colorStack.size == 1) { // second box is pressed, this will determine if it's going to be horizontal or vertical
+                                    if (firstBox.first == coords[index].first) {
+                                        isVertical = true
+                                    } else {
+                                        isHorizontal = true
+                                    }
+                                }
+                                if (colors[index] == Color.Green) { // if the box that the finger is on was already green make the previous box gray
+                                    colors[colorStack.pop().first] = cellBackgroundColor
+                                    break
+                                } else {
+                                    if (isHorizontal) { // once the drag is horizontal ignore all of the vertical drag events
+                                        if (firstBox.second != coords[index].second) {
+                                            break
+                                        } else {
+                                            colors[index] = Color.Green
+                                            colorStack.push(index to letters[index])
+                                        }
+                                    } else if (isVertical) { // same as above just for vertical
+                                        if (firstBox.first != coords[index].first) {
+                                            break
+                                        } else {
+                                            colors[index] = Color.Green
+                                            colorStack.push(index to letters[index])
+                                        }
+                                    } else { // first box will be highlighted before the drag has direction
+                                        colors[index] = Color.Green
+                                        colorStack.push(index to letters[index])
+                                        if (colorStack.size == 1) {// the first box that is pressed
+                                            firstBox = coords[index]
+                                        }
+                                    }
+                                    break
+                                }
+                            }
+                        }
+                    }
+                )
+            },
+        content = {
+            items(letters.size) { index ->
+                Box(
+                    modifier = Modifier
+                        .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline))
+                        .onGloballyPositioned { coordinates ->
+                            width[0] = coordinates.size.width
+                            height[0] = coordinates.size.height
+                        }
+                        .background(colors[index]!!)
+                        .fillMaxSize()
+                ) {
+                    Text(
+                        text = letters[index].toString().uppercase(Locale.ROOT),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 30.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+            }
+        }
+    )
+}
+
+fun getSortedEntries(
+    entryList: List<Entry>,
+    numOfWords: Int,
+    numOfColumns: Int,
+    numOfRows: Int
+): List<Entry> {
     var iterations = 0
     var returnList = listOf<Entry>()
     while (++iterations < 100) {
-        var words =
-            entryList!!.asSequence().shuffled().take(numOfWords).toList()
+        val words =
+            entryList.asSequence().shuffled().take(numOfWords).toList()
                 .distinct()
         var isLonger = false
         words.forEach { word ->
@@ -398,32 +469,42 @@ fun getSortedEntries(entryList: List<Entry>, numOfWords: Int, numOfColumns: Int,
 }
 
 @Composable
-fun CreateDialog() {
+fun CreateDialog(
+    title: String,
+    text: String,
+    screen: Screen,
+    navController: NavHostController
+) { // TODO make this reusable for both winning and losing dialog with a screen parameter
     AlertDialog(
         onDismissRequest = {
-            // Dismiss the dialog when the user clicks outside the dialog or on the back
-            // button. If you want to disable that functionality, simply use an empty
-            // onCloseRequest.
         },
         title = {
-            Text(text = "Dialog Title")
+            Text(text = title)
         },
         text = {
-            Text("Here is a text ")
+            Text(text)
         },
         confirmButton = {
             Button(
-
                 onClick = {
+                    navController.navigate(screen.route) {
+                        // this should be navigating without being able to go back
+                        popUpTo(Screen.Home.route)
+                        // Avoid multiple copies of the same destination when
+                        // reselecting the same item
+                        launchSingleTop = true
+                        // Restore state when reselecting a previously selected item
+                        restoreState = true
+                    }
                 }) {
-                Text("This is the Confirm Button")
+                Text(stringResource(id = R.string.completed))
             }
         },
     )
 }
 
 @Composable
-fun CreateWordGrid(words: List<String>) {
+fun CreateWordGrid(words: List<String>, isFound: List<Boolean>) {
     Spacer(modifier = Modifier.height(10.dp))
     if (words.isNotEmpty()) {
         Box(
@@ -439,11 +520,17 @@ fun CreateWordGrid(words: List<String>) {
                     .padding(5.dp),
                 columns = GridCells.Fixed(3),
                 content = {
-                    items(words) { word ->
+                    itemsIndexed(words) { index, word ->
+                        var alpha = ContentAlpha.high
+                        if (isFound[index]) {
+                            alpha = ContentAlpha.disabled
+                        }
                         Text(
                             text = word,
                             textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(vertical = 2.dp)
+                            modifier = Modifier
+                                .padding(vertical = 2.dp)
+                                .alpha(alpha),
                         )
                     }
                 }

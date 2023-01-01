@@ -18,4 +18,9 @@
     <string name="sound_volume">Sound Volume</string>
     <string name="change_language">Change Language (Delete Dictionary)</string>
     <string name="change">Change</string>
+    <string name="completed">Continue</string>
+    <string name="congratulations">Congratulations!</string>
+    <string name="completed_game">You completed this test in time.</string>
+    <string name="out_of_time">You\'re out of time!</string>
+    <string name="better_luck">Better luck next time.</string>
 </resources>
