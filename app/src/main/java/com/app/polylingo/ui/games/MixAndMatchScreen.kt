@@ -10,30 +10,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.app.polylingo.R
 import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.ui.components.scaffolds.GameScaffold
-import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFAB
 import com.app.polylingo.ui.navigation.Screen
-import java.util.*
 
 @Composable
 fun MixAndMatchScreen(
@@ -95,10 +88,17 @@ private fun MixAndMatchScreenContent(
         }
     }
 
-    var words = mutableListOf<Entry>()
+    var words = remember{ mutableListOf<String>()} // isn't saving
 
-    entries.forEach { entry ->
-        words.add(entry)
+    // TODO follow word search and first recomp is empty words and 2nd is displaying words
+    if (words.isEmpty()) {
+        entries.forEach { entry ->
+            words.add(entry.word)
+            words.add(entry.translatedWord)
+        }
+        var temp = words.shuffled()
+        words.clear()
+        words.addAll(temp)
     }
 
     var openOutOfTimeDialog by remember { mutableStateOf(false) }
@@ -111,7 +111,7 @@ private fun MixAndMatchScreenContent(
             .padding(10.dp)
     ) {
 
-        CreateWordGrid(numOfColumns, numOfRows, words, isFound,
+        CreateWordGrid(numOfColumns, numOfRows, entries, isFound,words,
             setOpenDialog = {
                 openCompletedDialog = true
             }
@@ -149,37 +149,27 @@ fun CreateWordGrid(
     numOfRows: Int,
     entries: List<Entry>,
     isFound: MutableList<Boolean>,
+    words: MutableList<String>,
     setOpenDialog: () -> Unit = {}
 ) {
-    var words = remember{ mutableListOf<String>()}
 
-    if (words.isEmpty()) {
-        entries.forEach { entry ->
-            words.add(entry.word)
-            words.add(entry.translatedWord)
-        }
-        words = words.shuffled() as MutableList<String>
-    }
 
     val cellBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
 
     val colors = remember { mutableStateMapOf<Int, Color>() }
 
-    words.forEachIndexed { index, _ ->
-        if (colors[index] == null) {
-            colors[index] = cellBackgroundColor
+        words.forEachIndexed { index, _ ->
+            if (colors[index] == null) {
+                colors[index] = cellBackgroundColor
+            }
         }
-    }
 
     val foundWordsIndex = remember { mutableListOf<Int>() }
 
     var currentlySelected by remember{ mutableStateOf("") }
 
-    val lazyListState = rememberLazyGridState()
-
     LazyVerticalGrid(
         columns = GridCells.Fixed(numOfColumns),
-        state = lazyListState,
         content = {
             items(words.size) { index ->
                 Box(

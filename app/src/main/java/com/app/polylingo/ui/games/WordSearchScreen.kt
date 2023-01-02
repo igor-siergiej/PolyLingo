@@ -296,7 +296,7 @@ fun CreateGrid(
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(numOfColumns),
-        state = lazyListState,
+        state = lazyListState, // TODO REMOVE
         modifier = Modifier
             /*.draggable(
                 state = state,
