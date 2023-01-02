@@ -73,7 +73,7 @@ private fun GameConfigScreenContent(
         Slider(
             value = timeSliderPosition.toFloat(),
             onValueChange = { timeSliderPosition = it.toInt() },
-            valueRange = 30f..120f,
+            valueRange = 2f..120f,
             steps = 2
         )
 

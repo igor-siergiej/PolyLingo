@@ -31,7 +31,6 @@ import com.app.polylingo.R
 import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.ui.components.scaffolds.GameScaffold
-import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFABAndOptions
 import com.app.polylingo.ui.navigation.Screen
 import java.util.*
 import kotlin.collections.ArrayList
@@ -113,9 +112,6 @@ fun WordSearchContent(
     entries.forEach { entry ->
         words.add(entry.word)
     }
-
-
-
 
 
     var openOutOfTimeDialog by remember { mutableStateOf(false) }
@@ -212,7 +208,6 @@ fun WordSearchContent(
         }
     }
 
-    // map of coordinates
 
 
 
@@ -236,22 +231,21 @@ fun WordSearchContent(
             })
 
         if (openCompletedDialog) {
-            CreateDialog(
+            CreateCompletedDialog(
                 stringResource(R.string.congratulations),
                 stringResource(R.string.completed_game),
                 Screen.Home,
                 navController,
-                false
             )
         }
 
         if (openOutOfTimeDialog) {
-            CreateDialog(
+            CreateErrorDialog(
                 stringResource(R.string.out_of_time),
                 stringResource(R.string.better_luck),
-                Screen.Games,
+                Screen.WordSearch,
                 navController,
-                true
+                numOfWords,time
             )
         }
     }
@@ -283,6 +277,7 @@ fun CreateGrid(
     val coords = remember { mutableListOf<Pair<Int, Int>>() }
 
 
+    // map of coordinates
     coords.clear()
     for (j in 1..numOfRows) {
         for (i in 1..numOfColumns) {
@@ -468,33 +463,22 @@ fun getSortedEntries(
     return returnList
 }
 
-//TODO create a "Try again" button here so that user can restart game instead of having to get to the game again
-//TODO create two methods instead
+
 @Composable
-fun CreateDialog(
+fun CreateCompletedDialog(
     title: String,
     text: String,
     screen: Screen,
     navController: NavHostController,
-    isErrorDialog: Boolean
 ) {
     AlertDialog(
         onDismissRequest = {
         },
         title = {
-            if (isErrorDialog) {
-                Text(text = title, color = Color.Red)
-            } else {
-                Text(text = title)
-            }
-
+            Text(text = title)
         },
         text = {
-            if (isErrorDialog) {
-                Text(text = text, color = Color.Red)
-            } else {
-                Text(text = text)
-            }
+            Text(text = text)
         },
         confirmButton = {
             Button(
@@ -512,6 +496,59 @@ fun CreateDialog(
                 Text(stringResource(id = R.string.completed))
             }
         },
+    )
+}
+
+@Composable
+fun CreateErrorDialog(
+    title: String,
+    text: String,
+    retryScreen: Screen,
+    navController: NavHostController,
+    numOfWords: Int,
+    time: Int
+    ) {
+    AlertDialog(
+        onDismissRequest = {
+        },
+        title = {
+            Text(text = title, color = Color.Red)
+        },
+        text = {
+            Text(text = text, color = Color.Red)
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    navController.navigate("${retryScreen.route}/${numOfWords}/${time}") {
+                        // this should be navigating without being able to go back
+                        popUpTo(Screen.Games.route)
+                        // Avoid multiple copies of the same destination when
+                        // reselecting the same item
+                        launchSingleTop = true
+                        // Restore state when reselecting a previously selected item
+                        restoreState = true
+                    }
+                }) {
+                Text(stringResource(id = R.string.try_again))
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = {
+                    navController.navigate(Screen.Home.route) {
+                        // this should be navigating without being able to go back
+                        popUpTo(Screen.Home.route)
+                        // Avoid multiple copies of the same destination when
+                        // reselecting the same item
+                        launchSingleTop = true
+                        // Restore state when reselecting a previously selected item
+                        restoreState = true
+                    }
+                }) {
+                Text(stringResource(id = R.string.completed))
+            }
+        }
     )
 }
 
@@ -557,6 +594,8 @@ fun CreateTimer(
     time: Int,
     setOpenDialog: () -> Unit = {},
 ) {
+    // TODO create a time left text with a time icon row
+    //TODO pause timer when dialogs are open?
     val color = ProgressIndicatorDefaults.linearColor
     val indicatorColor = remember { mutableStateOf(color) }
 

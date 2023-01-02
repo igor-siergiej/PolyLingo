@@ -28,4 +28,10 @@
     <string name="tip">Tip</string>
     <string name="hint">Here\'s a Hint!</string>
     <string name="confirm">Got it!</string>
+    <string name="try_again">Try Again</string>
+    <string name="mix_and_match_tip">Tap the pairs of tiles that mean the same thing in both languages.</string>
+    <string name="back_dialog">Are you sure?</string>
+    <string name="back_dialog_text">This game attempt will not be saved if you leave now.</string>
+    <string name="sure">I\'m sure!</string>
+    <string name="nevermind">Nevermind...</string>
 </resources>

@@ -7,13 +7,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.app.polylingo.R
 import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
+import com.app.polylingo.ui.components.scaffolds.GameScaffold
 import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFAB
 
-// add back button that takes the user to games screen but first show a dialog to confirm
 @Composable
 fun MixAndMatchScreen(
     entryViewModel: EntryViewModel,
@@ -21,25 +23,10 @@ fun MixAndMatchScreen(
     numOfWords: Int,
     time: Int
 ) {
-    var words: List<Entry> = listOf()
-
-    val test by entryViewModel.entryList.observeAsState(listOf())
-
-    var entries: MutableList<Entry>
-
-    if (test.isNotEmpty()) {
-        words = test.asSequence().shuffled().take(numOfWords).toList().distinct()
-    }
-
-    /*
-    val randomInts = generateSequence { Random.nextInt(1..69) }
-            .distinct()
-            .take(6)
-    */
-
-    MainScaffoldWithoutFAB(
+    GameScaffold(
         navController = navController,
-        titleText = "$numOfWords $time"
+        titleText = "$numOfWords $time",
+        tipText = stringResource(id = R.string.mix_and_match_tip)
         //titleText = stringArrayResource(id = R.array.game_names_list).toList()[0]
     ) { innerPadding ->
         Surface(
@@ -49,7 +36,10 @@ fun MixAndMatchScreen(
         ) {
             MixAndMatchScreenContent(
                 modifier = Modifier.padding(8.dp),
-                words = words
+                entryViewModel = entryViewModel,
+                numOfWords = numOfWords,
+                time = time,
+                navController = navController
             )
         }
     }
@@ -57,8 +47,11 @@ fun MixAndMatchScreen(
 
 @Composable
 private fun MixAndMatchScreenContent(
-    modifier: Modifier = Modifier,
-    words: List<Entry>
+    modifier: Modifier,
+    entryViewModel: EntryViewModel,
+    numOfWords: Int,
+    time: Int,
+    navController: NavHostController
 ) {
 
 }

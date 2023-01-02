@@ -101,9 +101,15 @@ fun GameTopBar(
     tipText: String,
     navController: NavController
 ) {
-    var openDialog by remember { mutableStateOf(false)  }
-    if (openDialog) {
-        CreateTipDialog(tipText = tipText, setCloseDialog = {openDialog = false})
+    var openTipDialog by remember { mutableStateOf(false) }
+    var openBackDialog by remember { mutableStateOf(false) }
+
+    if (openTipDialog) {
+        CreateTipDialog(tipText = tipText, setCloseDialog = { openTipDialog = false })
+    }
+
+    if (openBackDialog) {
+        CreateBackDialog(setCloseDialog = { openBackDialog = false }, navController = navController)
     }
     CenterAlignedTopAppBar(
         title = { Text(titleText) },
@@ -113,8 +119,7 @@ fun GameTopBar(
         navigationIcon = {
             FilledIconButton(
                 onClick = {
-                    // Create alert dialog if the user is sure they want to exit
-                    navController.navigateUp()
+                    openBackDialog = true
                 }) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
@@ -125,7 +130,7 @@ fun GameTopBar(
         actions = {
             FilledIconButton(
                 onClick = {
-                    openDialog = true
+                    openTipDialog = true
                     // Create alert dialog with help tips
                 }) {
                 Icon(
@@ -144,8 +149,7 @@ fun CreateTipDialog(
     setCloseDialog: () -> Unit = {}
 ) {
     AlertDialog(
-        onDismissRequest = {
-        },
+        onDismissRequest = { setCloseDialog() },
         title = {
             Text(text = stringResource(id = R.string.hint))
         },
@@ -163,11 +167,43 @@ fun CreateTipDialog(
     )
 }
 
+@Composable
+fun CreateBackDialog(
+    navController: NavController,
+    setCloseDialog: () -> Unit = {}
+) {
+    AlertDialog(
+        onDismissRequest = { setCloseDialog() },
+        title = {
+            Text(text = stringResource(id = R.string.back_dialog), color = Color.Red)
+        },
+        text = {
+            Text(text = stringResource(id = R.string.back_dialog_text), color = Color.Red)
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    navController.navigateUp()
+                }) {
+                Text(stringResource(id = R.string.sure))
+            }
+        },
+        dismissButton = {
+            OutlinedButton(
+                onClick = {
+                    setCloseDialog()
+                }) {
+                Text(stringResource(id = R.string.nevermind))
+            }
+        }
+    )
+}
+
 @Preview
 @Composable
 private fun MainTopBarPreview() {
     PolyLingoTheme(dynamicColor = false) {
         var navController = rememberNavController()
-        GameTopBar(titleText = "Test","tt" ,navController)
+        GameTopBar(titleText = "Test", "tt", navController)
     }
 }
