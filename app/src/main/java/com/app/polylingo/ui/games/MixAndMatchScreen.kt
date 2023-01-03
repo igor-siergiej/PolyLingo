@@ -56,7 +56,8 @@ fun MixAndMatchScreen(
                 entryViewModel = entryViewModel,
                 numOfWords = numOfWords,
                 time = time,
-                navController = navController
+                navController = navController,
+                timer = timer
             )
         }
     }
@@ -68,7 +69,8 @@ private fun MixAndMatchScreenContent(
     entryViewModel: EntryViewModel,
     numOfWords: Int,
     time: Int,
-    navController: NavHostController
+    navController: NavHostController,
+    timer: Timer,
 ) {
     var numOfColumns = 0
     when (numOfWords) {
@@ -120,10 +122,10 @@ private fun MixAndMatchScreenContent(
             }
         )
 
-      /*  CreateTimer(time = time,
+      CreateTimer(time = time,
             setOpenDialog = {
                 openOutOfTimeDialog = true
-            },timer)*/
+            },timer)
 
         if (openCompletedDialog) {
             CreateCompletedDialog(

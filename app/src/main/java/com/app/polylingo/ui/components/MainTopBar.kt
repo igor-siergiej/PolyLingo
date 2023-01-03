@@ -110,15 +110,13 @@ fun GameTopBar(
     if (openTipDialog) {
         timer.pauseTimer()
         CreateTipDialog(tipText = tipText, setCloseDialog = { openTipDialog = false }, resumeTimer = {timer.resumeTimer()})
-        //TODO lambda to resume
     }
 
-    /*if (openBackDialog) {
-        CreateBackDialog(setCloseDialog = { openBackDialog = false }, navController = navController)
+    if (openBackDialog) {
         timer.pauseTimer()
-    } else {
-        timer.resumeTimer()
-    }*/
+        CreateBackDialog(setCloseDialog = { openBackDialog = false }, navController = navController, resumeTimer = {timer.resumeTimer()})
+
+    }
 
     CenterAlignedTopAppBar(
         title = { Text(titleText) },
@@ -180,7 +178,8 @@ fun CreateTipDialog(
 @Composable
 fun CreateBackDialog(
     navController: NavController,
-    setCloseDialog: () -> Unit = {}
+    setCloseDialog: () -> Unit = {},
+    resumeTimer: () -> Unit = {}
 ) {
     AlertDialog(
         onDismissRequest = { setCloseDialog() },
@@ -202,6 +201,7 @@ fun CreateBackDialog(
             OutlinedButton(
                 onClick = {
                     setCloseDialog()
+                    resumeTimer()
                 }) {
                 Text(stringResource(id = R.string.nevermind))
             }
