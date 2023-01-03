@@ -59,6 +59,7 @@ private fun GameConfigScreenContent(
     Column(
         modifier = Modifier.padding(20.dp)
     ) {
+        //TODO ICONS?
         Text(text = "Number of words: $numOfWordsSliderPosition")
 
         Slider(

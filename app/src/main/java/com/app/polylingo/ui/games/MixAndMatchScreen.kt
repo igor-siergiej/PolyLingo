@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -17,6 +18,7 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -35,10 +37,13 @@ fun MixAndMatchScreen(
     numOfWords: Int,
     time: Int
 ) {
+    val timer = remember{ Timer()}
     GameScaffold(
         navController = navController,
         titleText = "$numOfWords $time",
-        tipText = stringResource(id = R.string.mix_and_match_tip)
+        tipText = stringResource(id = R.string.mix_and_match_tip),
+        timer = timer
+        //TODO Remember undo this
         //titleText = stringArrayResource(id = R.array.game_names_list).toList()[0]
     ) { innerPadding ->
         Surface(
@@ -70,33 +75,31 @@ private fun MixAndMatchScreenContent(
         3 -> {
             numOfColumns = 3
         }
-        6,9,12 -> {
+        6, 9, 12 -> {
             numOfColumns = 4
         }
     }
 
     val entryList = entryViewModel.entryList.value
 
-    val numOfRows = numOfWords * 2 / numOfColumns
+    val entries =
+        remember { entryList!!.asSequence().shuffled().take(numOfWords).toList().distinct() }
 
-    var entries = remember { entryList!!.asSequence().shuffled().take(numOfWords).toList().distinct() }
-
-    var isFound = remember { mutableListOf<Boolean>() }
+    val isFound = remember { mutableListOf<Boolean>() }
     if (isFound.isEmpty()) {
-        for (i in 0 until numOfWords*2) {
+        for (i in 0 until numOfWords * 2) {
             isFound.add(false)
         }
     }
 
-    var words = remember{ mutableListOf<String>()} // isn't saving
+    val words = remember { mutableListOf<String>() }
 
-    // TODO follow word search and first recomp is empty words and 2nd is displaying words
     if (words.isEmpty()) {
         entries.forEach { entry ->
             words.add(entry.word)
             words.add(entry.translatedWord)
         }
-        var temp = words.shuffled()
+        val temp = words.shuffled()
         words.clear()
         words.addAll(temp)
     }
@@ -111,16 +114,16 @@ private fun MixAndMatchScreenContent(
             .padding(10.dp)
     ) {
 
-        CreateWordGrid(numOfColumns, numOfRows, entries, isFound,words,
+        CreateWordGrid(numOfColumns, entries, isFound, words,
             setOpenDialog = {
                 openCompletedDialog = true
             }
         )
 
-        CreateTimer(time = time,
+      /*  CreateTimer(time = time,
             setOpenDialog = {
                 openOutOfTimeDialog = true
-            })
+            },timer)*/
 
         if (openCompletedDialog) {
             CreateCompletedDialog(
@@ -137,7 +140,7 @@ private fun MixAndMatchScreenContent(
                 stringResource(R.string.better_luck),
                 Screen.WordSearch,
                 navController,
-                numOfWords,time
+                numOfWords, time
             )
         }
     }
@@ -146,27 +149,24 @@ private fun MixAndMatchScreenContent(
 @Composable
 fun CreateWordGrid(
     numOfColumns: Int,
-    numOfRows: Int,
     entries: List<Entry>,
     isFound: MutableList<Boolean>,
     words: MutableList<String>,
     setOpenDialog: () -> Unit = {}
 ) {
-
-
     val cellBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
 
     val colors = remember { mutableStateMapOf<Int, Color>() }
 
-        words.forEachIndexed { index, _ ->
-            if (colors[index] == null) {
-                colors[index] = cellBackgroundColor
-            }
+    words.forEachIndexed { index, _ ->
+        if (colors[index] == null) {
+            colors[index] = cellBackgroundColor
         }
+    }
 
     val foundWordsIndex = remember { mutableListOf<Int>() }
 
-    var currentlySelected by remember{ mutableStateOf("") }
+    var currentlySelected by remember { mutableStateOf("") }
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(numOfColumns),
@@ -178,16 +178,22 @@ fun CreateWordGrid(
                         .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline))
                         .background(colors[index]!!)
                         .fillMaxSize()
+                        .clip(RoundedCornerShape(10.dp))
                         .clickable {
-                            // if something is selected, check that it matches against entryList
-                            // if it does match mark the pair as is found and clear selected
                             if (currentlySelected.isEmpty()) {
-                                // if blue then ignore
+                                if (colors[words.indexOf(currentlySelected)] == Color.Blue) {
+                                    return@clickable
+                                }
                                 currentlySelected = words[index]
                                 colors[index] = Color.Green
                                 return@clickable
                             } else {
-                                if (doSelectedWordsMatch(currentlySelected,words[index],entries)) {
+                                if (doSelectedWordsMatch(
+                                        currentlySelected,
+                                        words[index],
+                                        entries
+                                    )
+                                ) {
                                     foundWordsIndex.add(index)
                                     foundWordsIndex.add(words.indexOf(currentlySelected))
                                     isFound[index] = true
@@ -219,7 +225,9 @@ fun CreateWordGrid(
                     Text(
                         text = words[index],
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.align(Alignment.Center)
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(vertical = 5.dp)
                     )
                 }
             }
@@ -230,12 +238,12 @@ fun CreateWordGrid(
 fun doSelectedWordsMatch(selectedWord: String, otherWord: String, entries: List<Entry>): Boolean {
     var doWordsMatch = false
 
-    entries.forEach{ entry ->
-        if (selectedWord == entry.word && otherWord == entry.translatedWord||
-                selectedWord == entry.translatedWord && otherWord == entry.word) {
+    entries.forEach { entry ->
+        if (selectedWord == entry.word && otherWord == entry.translatedWord ||
+            selectedWord == entry.translatedWord && otherWord == entry.word
+        ) {
             doWordsMatch = true
         }
     }
-
     return doWordsMatch
 }

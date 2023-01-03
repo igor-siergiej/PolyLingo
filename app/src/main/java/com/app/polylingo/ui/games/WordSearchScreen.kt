@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -43,10 +45,13 @@ fun WordSearchScreen(
     numOfWords: Int,
     time: Int
 ) {
+    val timer = remember { Timer() }
+    // TODO timer object here that's passed to both scaffold and content?
     GameScaffold(
         navController = navController,
         titleText = "$numOfWords $time",
-        tipText = stringResource(id = R.string.word_search_tip)
+        tipText = stringResource(id = R.string.word_search_tip),
+        timer = timer
         //titleText = stringArrayResource(id = R.array.game_names_list).toList()[0]
     ) { innerPadding ->
         Surface(
@@ -59,7 +64,8 @@ fun WordSearchScreen(
                 entryViewModel = entryViewModel,
                 numOfWords = numOfWords,
                 time = time,
-                navController = navController
+                navController = navController,
+                timer = timer
             )
         }
     }
@@ -71,7 +77,8 @@ fun WordSearchContent(
     entryViewModel: EntryViewModel,
     numOfWords: Int,
     time: Int,
-    navController: NavHostController
+    navController: NavHostController,
+    timer: Timer,
 ) {
     val entryList = entryViewModel.entryList.value
 
@@ -113,13 +120,10 @@ fun WordSearchContent(
         words.add(entry.word)
     }
 
-
     var openOutOfTimeDialog by remember { mutableStateOf(false) }
     var openCompletedDialog by remember { mutableStateOf(false) }
 
-
     val cells = remember { List(numOfRows) { CharArray(numOfColumns) } }
-
 
     LaunchedEffect(Unit) {
         var numAttempts = 0
@@ -225,10 +229,13 @@ fun WordSearchContent(
 
         CreateWordGrid(words = words, isFound = isFound)
 
-        CreateTimer(time = time,
+        CreateTimer(
+            time = time,
             setOpenDialog = {
                 openOutOfTimeDialog = true
-            })
+            },
+            timer = timer
+        )
 
         if (openCompletedDialog) {
             CreateCompletedDialog(
@@ -245,7 +252,7 @@ fun WordSearchContent(
                 stringResource(R.string.better_luck),
                 Screen.WordSearch,
                 navController,
-                numOfWords,time
+                numOfWords, time
             )
         }
     }
@@ -507,7 +514,7 @@ fun CreateErrorDialog(
     navController: NavHostController,
     numOfWords: Int,
     time: Int
-    ) {
+) {
     AlertDialog(
         onDismissRequest = {
         },
@@ -593,10 +600,11 @@ fun CreateWordGrid(words: List<String>, isFound: List<Boolean>) {
 fun CreateTimer(
     time: Int,
     setOpenDialog: () -> Unit = {},
+    timer: Timer
 ) {
-    // TODO create a time left text with a time icon row
     //TODO pause timer when dialogs are open?
     val color = ProgressIndicatorDefaults.linearColor
+
     val indicatorColor = remember { mutableStateOf(color) }
 
     var progress by remember { mutableStateOf(1f) }
@@ -606,24 +614,91 @@ fun CreateTimer(
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
     ).value
 
-    LinearProgressIndicator(
-        modifier = Modifier.fillMaxWidth(),
-        progress = animatedProgress,
-        color = indicatorColor.value
-    )
-
-    val timer = object : CountDownTimer((time * 1000).toLong(), 100) {
-        override fun onTick(millisUntilFinished: Long) {
-            progress = millisUntilFinished / 1000f / time
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Icon(
+                modifier = Modifier.padding(5.dp),
+                imageVector = Icons.Filled.AccessTime,
+                contentDescription = stringResource(id = R.string.time_left_description)
+            )
+            Text(text = stringResource(id = R.string.time_left))
         }
+        LinearProgressIndicator(
+            modifier = Modifier.fillMaxWidth(),
+            progress = animatedProgress,
+            color = indicatorColor.value
+        )
+    }
 
-        override fun onFinish() {
-            progress = 1f
-            indicatorColor.value = Color.Red
-            setOpenDialog()
+    LaunchedEffect(Unit) {
+        timer.createTimer(
+            time,
+            onTick = { timeLeft ->
+                progress = timeLeft / 1000f / time
+            },
+            onFinish = {
+                progress = 1f
+                indicatorColor.value = Color.Red
+                setOpenDialog()
+            })
+        timer.startTimer()
+    }
+}
+
+class Timer {
+    lateinit var timer: CountDownTimer
+    var timeInMilliSeconds = 0L
+    var tick = { timeLeft:Long ->}
+    var finish = {}
+
+    fun createTimer(
+        timeInSeconds: Int,
+        onTick: (timeLeft: Long) -> Unit = {},
+        onFinish: () -> Unit = {}
+    ) {
+        timeInMilliSeconds = (timeInSeconds * 1000).toLong()
+        tick = onTick
+        finish = onFinish
+
+        timer = object : CountDownTimer((timeInMilliSeconds), 100) {
+            override fun onTick(millisUntilFinished: Long) {
+                timeInMilliSeconds = millisUntilFinished
+                println(timeInMilliSeconds)
+                tick(timeInMilliSeconds)
+            }
+
+            override fun onFinish() {
+                finish()
+            }
         }
     }
-    LaunchedEffect(Unit) {
+
+    fun pauseTimer() {
+        if (this::timer.isInitialized) {
+            timer.cancel()
+        }
+    }
+
+    fun startTimer() {
+        if (this::timer.isInitialized) {
+            timer.start()
+        }
+    }
+
+    fun resumeTimer() {
+        timer = object : CountDownTimer((timeInMilliSeconds), 100) {
+            override fun onTick(millisUntilFinished: Long) {
+                timeInMilliSeconds = millisUntilFinished
+                println(timeInMilliSeconds)
+                tick(timeInMilliSeconds)
+            }
+
+            override fun onFinish() {
+                finish()
+            }
+        }
         timer.start()
     }
 }

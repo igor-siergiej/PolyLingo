@@ -1,5 +1,6 @@
 package com.app.polylingo.ui.components.scaffolds
 
+import android.os.CountDownTimer
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -10,6 +11,7 @@ import com.app.polylingo.ui.components.GameTopBar
 import com.app.polylingo.ui.components.MainBottomBar
 import com.app.polylingo.ui.components.MainTopBar
 import com.app.polylingo.ui.components.MainTopBarWithoutOptions
+import com.app.polylingo.ui.games.Timer
 import com.app.polylingo.ui.theme.PolyLingoTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,11 +57,12 @@ fun GameScaffold(
     navController: NavHostController,
     titleText: String,
     tipText: String,
+    timer: Timer,
     pageContent: @Composable (innerPadding: PaddingValues) -> Unit = {}
 ) {
     Scaffold(
         topBar = {
-            GameTopBar(titleText,tipText,navController)
+            GameTopBar(titleText,tipText,navController,timer)
         },
         content = { innerPadding ->
             pageContent(innerPadding)

@@ -1,5 +1,6 @@
 package com.app.polylingo.ui.components
 
+import android.os.CountDownTimer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,6 +21,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.app.polylingo.R
 import com.app.polylingo.ui.components.scaffolds.LanguageScaffold
+import com.app.polylingo.ui.games.Timer
 import com.app.polylingo.ui.navigation.Screen
 import com.app.polylingo.ui.theme.PolyLingoTheme
 
@@ -99,18 +101,25 @@ fun MainTopBarWithoutOptions(
 fun GameTopBar(
     titleText: String,
     tipText: String,
-    navController: NavController
+    navController: NavController,
+    timer: Timer
 ) {
     var openTipDialog by remember { mutableStateOf(false) }
     var openBackDialog by remember { mutableStateOf(false) }
 
     if (openTipDialog) {
-        CreateTipDialog(tipText = tipText, setCloseDialog = { openTipDialog = false })
+        timer.pauseTimer()
+        CreateTipDialog(tipText = tipText, setCloseDialog = { openTipDialog = false }, resumeTimer = {timer.resumeTimer()})
+        //TODO lambda to resume
     }
 
-    if (openBackDialog) {
+    /*if (openBackDialog) {
         CreateBackDialog(setCloseDialog = { openBackDialog = false }, navController = navController)
-    }
+        timer.pauseTimer()
+    } else {
+        timer.resumeTimer()
+    }*/
+
     CenterAlignedTopAppBar(
         title = { Text(titleText) },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -131,7 +140,6 @@ fun GameTopBar(
             FilledIconButton(
                 onClick = {
                     openTipDialog = true
-                    // Create alert dialog with help tips
                 }) {
                 Icon(
                     imageVector = Icons.Filled.HelpOutline,
@@ -146,7 +154,8 @@ fun GameTopBar(
 @Composable
 fun CreateTipDialog(
     tipText: String,
-    setCloseDialog: () -> Unit = {}
+    setCloseDialog: () -> Unit = {},
+    resumeTimer: () -> Unit = {}
 ) {
     AlertDialog(
         onDismissRequest = { setCloseDialog() },
@@ -160,6 +169,7 @@ fun CreateTipDialog(
             Button(
                 onClick = {
                     setCloseDialog()
+                    resumeTimer()
                 }) {
                 Text(stringResource(id = R.string.confirm))
             }
@@ -204,6 +214,6 @@ fun CreateBackDialog(
 private fun MainTopBarPreview() {
     PolyLingoTheme(dynamicColor = false) {
         var navController = rememberNavController()
-        GameTopBar(titleText = "Test", "tt", navController)
+        GameTopBar(titleText = "Test", "tt", navController, Timer())
     }
 }

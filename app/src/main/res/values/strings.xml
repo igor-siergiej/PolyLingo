@@ -33,5 +33,7 @@
     <string name="back_dialog">Are you sure?</string>
     <string name="back_dialog_text">This game attempt will not be saved if you leave now.</string>
     <string name="sure">I\'m sure!</string>
-    <string name="nevermind">Nevermind...</string>
+    <string name="nevermind">Nevermind…</string>
+    <string name="time_left">Time left:</string>
+    <string name="time_left_description">Time left for current game</string>
 </resources>
