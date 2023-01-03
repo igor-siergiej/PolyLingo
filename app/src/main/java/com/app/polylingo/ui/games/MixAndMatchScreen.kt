@@ -64,7 +64,7 @@ private fun MixAndMatchScreenContent(
     timer: Timer,
 ) {
     var numOfColumns = 0
-    when (numOfWords) {
+    when (numOfWords) {// TODO num of columns should probably be 3
         3 -> {
             numOfColumns = 3
         }
@@ -131,7 +131,7 @@ private fun MixAndMatchScreenContent(
             CreateErrorDialog(
                 stringResource(R.string.out_of_time),
                 stringResource(R.string.better_luck),
-                Screen.WordSearch,
+                Screen.MixAndMatch,
                 navController,
                 numOfWords, time
             )
@@ -226,7 +226,7 @@ fun CreateWordGrid(
                                 text = words[index],
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier
-                                    .padding(vertical = 15.dp)
+                                    .padding(vertical = 25.dp)
                             )
                         }
                     }
@@ -237,6 +237,7 @@ fun CreateWordGrid(
 }
 
 fun doSelectedWordsMatch(selectedWord: String, otherWord: String, entries: List<Entry>): Boolean {
+
     var doWordsMatch = false
 
     entries.forEach { entry ->

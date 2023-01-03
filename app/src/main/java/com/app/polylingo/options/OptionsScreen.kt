@@ -17,6 +17,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.app.polylingo.R
 import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFABAndOptions
+import com.app.polylingo.ui.games.AreYouSureDialog
+import com.app.polylingo.ui.games.CreateErrorDialog
+import com.app.polylingo.ui.navigation.Screen
 
 @Composable
 fun OptionsScreen(
@@ -33,6 +36,7 @@ fun OptionsScreen(
         ) {
             OptionScreenContent(
                 modifier = Modifier.padding(8.dp),
+                navController = navController
             )
         }
     }
@@ -40,7 +44,8 @@ fun OptionsScreen(
 
 @Composable
 private fun OptionScreenContent(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavHostController
 ) {
     val audioManager = LocalContext.current.getSystemService(AUDIO_SERVICE) as AudioManager
     val volumeLevel = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
@@ -49,6 +54,8 @@ private fun OptionScreenContent(
     val currentVolume = remember {
         mutableStateOf(volumeLevel)
     }
+
+    var openAreYouSureDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -79,7 +86,7 @@ private fun OptionScreenContent(
                 currentVolume.value,0 // Set volume to slider position
             )
         })
-
+        // TODO fix layout
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Start
@@ -91,9 +98,19 @@ private fun OptionScreenContent(
             Text(text = stringResource(id = R.string.change_language))
         }
 
+        if (openAreYouSureDialog) {
+            AreYouSureDialog(
+                stringResource(R.string.back_dialog),
+                stringResource(R.string.deleting_dictionary),
+                navController,
+                setCloseDialog = {
+                    openAreYouSureDialog = false
+                }
+            )
+        }
+
         FilledTonalButton(onClick = {
-            //TODO pop up dialog to ask if user is sure then 
-            // delete dictionary and languages and send to languages screen
+            openAreYouSureDialog = true
         }) {
             Text(text = stringResource(id = R.string.change))
         }

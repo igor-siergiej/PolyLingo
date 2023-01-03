@@ -36,4 +36,5 @@
     <string name="nevermind">Nevermind…</string>
     <string name="time_left">Time left:</string>
     <string name="time_left_description">Time left for current game</string>
+    <string name="deleting_dictionary">This will delete your entire dictionary of words.</string>
 </resources>

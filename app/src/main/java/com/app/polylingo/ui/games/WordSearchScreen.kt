@@ -46,7 +46,7 @@ fun WordSearchScreen(
     time: Int
 ) {
     val timer = remember { Timer() }
-    // TODO timer object here that's passed to both scaffold and content?
+
     GameScaffold(
         navController = navController,
         titleText = "$numOfWords $time",
@@ -295,7 +295,6 @@ fun CreateGrid(
 
     val colorStack = ArrayDeque<Pair<Int, Char>>()
 
-    val lazyListState = rememberLazyGridState()
     var isHorizontal = false
     var isVertical = false
     var firstBox = Pair(0, 0)
@@ -303,7 +302,6 @@ fun CreateGrid(
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(numOfColumns),
-        state = lazyListState, // TODO REMOVE
         modifier = Modifier
             /*.draggable(
                 state = state,
@@ -560,6 +558,50 @@ fun CreateErrorDialog(
 }
 
 @Composable
+fun AreYouSureDialog(
+    title: String,
+    text: String,
+    navController: NavHostController,
+    setCloseDialog: () -> Unit = {}
+) {
+    AlertDialog(
+        onDismissRequest = { setCloseDialog() },
+        title = {
+            Text(text = title, color = Color.Red)
+        },
+        text = {
+            Text(text = text, color = Color.Red)
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    // TODO delete dictionary
+                    navController.navigate(Screen.Language.route) {
+                        // this should be navigating without being able to go back
+
+                        // TODO clear navigation
+                        // Avoid multiple copies of the same destination when
+                        // reselecting the same item
+                        launchSingleTop = true
+                        // Restore state when reselecting a previously selected item
+                        restoreState = true
+                    }
+                }) {
+                Text(stringResource(id = R.string.sure))
+            }
+        },
+        dismissButton = {
+            OutlinedButton(
+                onClick = {
+                    setCloseDialog()
+                }) {
+                Text(stringResource(id = R.string.nevermind))
+            }
+        }
+    )
+}
+
+@Composable
 fun CreateWordGrid(words: List<String>, isFound: List<Boolean>) {
     Spacer(modifier = Modifier.height(10.dp))
     if (words.isNotEmpty()) {
@@ -602,7 +644,7 @@ fun CreateTimer(
     setOpenDialog: () -> Unit = {},
     timer: Timer
 ) {
-    //TODO pause timer when dialogs are open?
+    //TODO fix layout
     val color = ProgressIndicatorDefaults.linearColor
 
     val indicatorColor = remember { mutableStateOf(color) }
@@ -624,7 +666,7 @@ fun CreateTimer(
                 contentDescription = stringResource(id = R.string.time_left_description)
             )
             Text(text = stringResource(id = R.string.time_left))
-            Text(text = (timer.timeInMilliSeconds/1000).toString())
+            Text(text = (timer.timeInMilliSeconds / 1000).toString())
         }
         LinearProgressIndicator(
             modifier = Modifier.fillMaxWidth(),
@@ -651,7 +693,7 @@ fun CreateTimer(
 class Timer {
     lateinit var timer: CountDownTimer
     var timeInMilliSeconds = 0L
-    var tick = { timeLeft:Long ->}
+    var tick = { timeLeft: Long -> }
     var finish = {}
 
     fun createTimer(
