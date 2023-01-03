@@ -16,15 +16,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.app.polylingo.R
+import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFABAndOptions
 import com.app.polylingo.ui.games.AreYouSureDialog
 import com.app.polylingo.ui.games.CreateErrorDialog
 import com.app.polylingo.ui.navigation.Screen
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun OptionsScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    entryViewModel: EntryViewModel
 ) {
+    var coroutineScope = rememberCoroutineScope()
+
     MainScaffoldWithoutFABAndOptions(
         navController = navController,
         titleText = stringResource(id = R.string.options)
@@ -36,7 +42,12 @@ fun OptionsScreen(
         ) {
             OptionScreenContent(
                 modifier = Modifier.padding(8.dp),
-                navController = navController
+                navController = navController,
+                deleteDictionary = {
+                    coroutineScope.launch(Dispatchers.IO) {
+                        entryViewModel.removeAll()
+                    }
+                }
             )
         }
     }
@@ -45,7 +56,8 @@ fun OptionsScreen(
 @Composable
 private fun OptionScreenContent(
     modifier: Modifier = Modifier,
-    navController: NavHostController
+    navController: NavHostController,
+    deleteDictionary: () -> Unit = {}
 ) {
     val audioManager = LocalContext.current.getSystemService(AUDIO_SERVICE) as AudioManager
     val volumeLevel = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
@@ -60,6 +72,7 @@ private fun OptionScreenContent(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .padding(5.dp)
             .verticalScroll(rememberScrollState()),
     ) {
         Row(
@@ -68,10 +81,11 @@ private fun OptionScreenContent(
         ) {
             Icon(
                 imageVector = Icons.Filled.Speaker,
-                contentDescription = stringResource(id = R.string.sound_volume)
+                contentDescription = stringResource(id = R.string.sound_volume),
+                modifier = Modifier.padding(end = 5.dp)
             )
             Text(text = stringResource(id = R.string.sound_volume))
-            Text(text = currentVolume.value.toString())
+            Text(text = ": " + currentVolume.value.toString())
         }
 
         Slider(
@@ -81,22 +95,33 @@ private fun OptionScreenContent(
             onValueChange = {
                 currentVolume.value = it.toInt()
 
-            audioManager.setStreamVolume(
-                AudioManager.STREAM_MUSIC,
-                currentVolume.value,0 // Set volume to slider position
-            )
-        })
-        // TODO fix layout
+                audioManager.setStreamVolume(
+                    AudioManager.STREAM_MUSIC,
+                    currentVolume.value, 0 // Set volume to slider position
+                )
+            }
+        )
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Start
         ) {
             Icon(
                 imageVector = Icons.Filled.Language,
-                contentDescription = stringResource(id = R.string.change_language)
+                contentDescription = stringResource(id = R.string.change_language),
+                modifier = Modifier.padding(end = 5.dp)
             )
             Text(text = stringResource(id = R.string.change_language))
         }
+
+        FilledTonalButton(
+            modifier = Modifier.padding(start = 5.dp, top = 10.dp),
+            onClick = {
+                openAreYouSureDialog = true
+            }) {
+            Text(text = stringResource(id = R.string.change))
+        }
+
+
 
         if (openAreYouSureDialog) {
             AreYouSureDialog(
@@ -105,14 +130,11 @@ private fun OptionScreenContent(
                 navController,
                 setCloseDialog = {
                     openAreYouSureDialog = false
+                },
+                deleteDictionary = {
+                    deleteDictionary()
                 }
             )
-        }
-
-        FilledTonalButton(onClick = {
-            openAreYouSureDialog = true
-        }) {
-            Text(text = stringResource(id = R.string.change))
         }
     }
 }

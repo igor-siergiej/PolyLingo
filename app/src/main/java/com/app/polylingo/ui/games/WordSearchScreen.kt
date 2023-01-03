@@ -562,7 +562,8 @@ fun AreYouSureDialog(
     title: String,
     text: String,
     navController: NavHostController,
-    setCloseDialog: () -> Unit = {}
+    setCloseDialog: () -> Unit = {},
+    deleteDictionary: () -> Unit = {}
 ) {
     AlertDialog(
         onDismissRequest = { setCloseDialog() },
@@ -575,7 +576,7 @@ fun AreYouSureDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    // TODO delete dictionary
+                    deleteDictionary()
                     navController.navigate(Screen.Language.route) {
                         // this should be navigating without being able to go back
 

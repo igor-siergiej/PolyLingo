@@ -16,7 +16,7 @@
     <string name="back">Back</string>
     <string name="options">Options</string>
     <string name="sound_volume">Sound Volume</string>
-    <string name="change_language">Change Language (Delete Dictionary)</string>
+    <string name="change_language">Change Language</string>
     <string name="change">Change</string>
     <string name="completed">Continue</string>
     <string name="congratulations">Congratulations!</string>

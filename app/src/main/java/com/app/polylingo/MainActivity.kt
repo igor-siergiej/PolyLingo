@@ -157,7 +157,7 @@ private fun BuildNavigationGraph(
             )
         }
 
-        composable(Screen.Options.route) { OptionsScreen(navController) }
+        composable(Screen.Options.route) { OptionsScreen(navController,entryViewModel) }
     }
 }
 

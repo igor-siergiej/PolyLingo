@@ -23,18 +23,27 @@ interface EntryDao {
     @Query("SELECT * FROM entries")
     fun getAllEntries(): LiveData<MutableList<Entry>>
 
-
-    // TODO these methods should also include being able to sort by translated word too
-
     @Query("SELECT * " +
             "FROM entries " +
             " ORDER BY word ASC"
             )
-    fun getAllEntriesSortedAsc(): MutableList<Entry>
+    fun getAllEntriesSortedByWordAsc(): MutableList<Entry>
 
     @Query("SELECT * " +
             "FROM entries " +
             " ORDER BY word DESC"
     )
-    fun getAllEntriesSortedDesc(): MutableList<Entry>
+    fun getAllEntriesSortedByWordDesc(): MutableList<Entry>
+
+    @Query("SELECT * " +
+            "FROM entries " +
+            " ORDER BY translated_entry ASC"
+    )
+    fun getAllEntriesSortedByTranslatedWordAsc(): MutableList<Entry>
+
+    @Query("SELECT * " +
+            "FROM entries " +
+            " ORDER BY translated_entry DESC"
+    )
+    fun getAllEntriesSortedByTranslatedWordDesc(): MutableList<Entry>
 }

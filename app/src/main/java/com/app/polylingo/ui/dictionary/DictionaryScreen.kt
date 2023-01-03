@@ -49,11 +49,17 @@ fun DictionaryScreenTopLevel(
         removeEntry = { entry ->
             entryViewModel.removeEntry(entry)
         },
-        sortAsc = {
-            entryViewModel.sortEntriesAsc()
+        sortByWordAsc = {
+            entryViewModel.sortEntriesByWordAsc()
         },
-        sortDesc = {
-            entryViewModel.sortEntriesDesc()
+        sortByWordDesc = {
+            entryViewModel.sortEntriesByWordDesc()
+        },
+        sortByTranslatedWordAsc = {
+            entryViewModel.sortEntriesByTranslatedWordAsc()
+        },
+        sortByTranslatedWordDesc = {
+            entryViewModel.sortEntriesByTranslatedWordDesc()
         }
     )
 }
@@ -65,10 +71,13 @@ fun DictionaryScreen(
     entries: List<Entry> = listOf(),
     languages: Pair<String, String>,
     removeEntry: (Entry) -> Unit = {},
-    sortAsc: () -> Unit = {},
-    sortDesc: () -> Unit = {}
+    sortByWordAsc: () -> Unit = {},
+    sortByWordDesc: () -> Unit = {},
+    sortByTranslatedWordAsc: () -> Unit = {},
+    sortByTranslatedWordDesc: () -> Unit = {}
 ) {
-    var sorted by remember { mutableStateOf(false) }
+    var sortedByWord by remember { mutableStateOf(false) }
+    var sortedByTranslatedWord by remember { mutableStateOf(false) }
 
     MainScaffold(
         navController = navController,
@@ -87,15 +96,6 @@ fun DictionaryScreen(
             ) {
                 stickyHeader {
                     Card(
-                        modifier = Modifier.clickable {
-                            if (sorted == false) {
-                                sortAsc()
-                                sorted = true
-                            } else {
-                                sortDesc()
-                                sorted = false
-                            }
-                        },
                         border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline)
                     ) {
                         Row(
@@ -108,8 +108,16 @@ fun DictionaryScreen(
                                 modifier = Modifier
                                     .weight(1f)
                                     .padding(vertical = 20.dp)
-                            // TODO sorting should be able to be done for both word and translated word
-                            //  make each text clickable and add sorting methods for translated word
+                                    .fillMaxSize()
+                                    .clickable {
+                                        if (sortedByWord == false) {
+                                            sortByWordAsc()
+                                            sortedByWord = true
+                                        } else {
+                                            sortByWordDesc()
+                                            sortedByWord = false
+                                        }
+                                    }
                             )
 
                             Divider(
@@ -126,6 +134,15 @@ fun DictionaryScreen(
                                 modifier = Modifier
                                     .weight(1f)
                                     .padding(vertical = 20.dp)
+                                    .clickable {
+                                        if (sortedByTranslatedWord == false) {
+                                            sortByTranslatedWordAsc()
+                                            sortedByTranslatedWord = true
+                                        } else {
+                                            sortByTranslatedWordDesc()
+                                            sortedByTranslatedWord = false
+                                        }
+                                    }
                             )
                         }
                     }
