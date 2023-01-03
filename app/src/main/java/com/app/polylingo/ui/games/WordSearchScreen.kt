@@ -541,7 +541,7 @@ fun CreateErrorDialog(
             }
         },
         dismissButton = {
-            Button(
+            OutlinedButton(
                 onClick = {
                     navController.navigate(Screen.Home.route) {
                         // this should be navigating without being able to go back
@@ -624,6 +624,7 @@ fun CreateTimer(
                 contentDescription = stringResource(id = R.string.time_left_description)
             )
             Text(text = stringResource(id = R.string.time_left))
+            Text(text = (timer.timeInMilliSeconds/1000).toString())
         }
         LinearProgressIndicator(
             modifier = Modifier.fillMaxWidth(),

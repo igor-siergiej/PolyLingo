@@ -4,10 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -52,7 +49,7 @@ fun MixAndMatchScreen(
                 .fillMaxSize()
         ) {
             MixAndMatchScreenContent(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier.padding(5.dp),
                 entryViewModel = entryViewModel,
                 numOfWords = numOfWords,
                 time = time,
@@ -113,7 +110,7 @@ private fun MixAndMatchScreenContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .padding(10.dp)
+            .padding(5.dp)
     ) {
 
         CreateWordGrid(numOfColumns, entries, isFound, words,
@@ -171,16 +168,17 @@ fun CreateWordGrid(
     var currentlySelected by remember { mutableStateOf("") }
 
     LazyVerticalGrid(
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
         columns = GridCells.Fixed(numOfColumns),
         content = {
             items(words.size) { index ->
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline))
                         .background(colors[index]!!)
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(10.dp))
+                        .fillMaxWidth()
+                        .clip(shape = RoundedCornerShape(size = 10.dp))
                         .clickable {
                             if (currentlySelected.isEmpty()) {
                                 if (colors[words.indexOf(currentlySelected)] == Color.Blue) {
@@ -226,10 +224,8 @@ fun CreateWordGrid(
                 ) {
                     Text(
                         text = words[index],
-                        textAlign = TextAlign.Center,
                         modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(vertical = 5.dp)
+                            .padding(vertical = 15.dp)
                     )
                 }
             }
