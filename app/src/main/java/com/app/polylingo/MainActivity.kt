@@ -59,7 +59,7 @@ private fun BuildNavigationGraph(
     val navController = rememberNavController()
 
     //testing word bank
-     val coroutineScope = rememberCoroutineScope()
+     /*val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(key1 = Unit) {
         coroutineScope.launch {
             entryViewModel.removeAll()
@@ -77,7 +77,7 @@ private fun BuildNavigationGraph(
             entryViewModel.addEntry(Entry("Verde", "Green"))
             entryViewModel.addEntry(Entry("Hija", "Daughter"))
         }
-    }
+    }*/
 
     // Each NavController is associated with a NavHost.
     // This links the NavController with a navigation graph.
@@ -157,21 +157,6 @@ private fun BuildNavigationGraph(
             )
         }
 
-        composable(Screen.Options.route) { OptionsScreen(navController,entryViewModel) }
+        composable(Screen.Options.route) { OptionsScreen(navController,entryViewModel,languageViewModel) }
     }
 }
-
-/*
-composable(
-route = "${Screen.GameConfigScreen.route}/{numOfWords}/{time}",
-arguments = listOf(
-navArgument("numOfWords") { type = NavType.IntType },
-(navArgument("time") { type = NavType.IntType })
-)
-) { backStackEntry ->
-    GameConfigScreen(
-        navController = navController,
-        numOfWords = backStackEntry.arguments?.getInt("numOfWords")!!,
-        time = backStackEntry.arguments?.getInt("time")!!
-    )
-}*/

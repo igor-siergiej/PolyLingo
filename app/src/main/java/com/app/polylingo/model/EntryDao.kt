@@ -18,7 +18,7 @@ interface EntryDao {
     suspend fun deleteEntry(entry: Entry)
 
     @Query("DELETE FROM entries")
-    suspend fun deleteAll()
+    suspend fun removeAll()
 
     @Query("SELECT * FROM entries")
     fun getAllEntries(): LiveData<MutableList<Entry>>

@@ -35,5 +35,8 @@ class LanguageViewModel(application: Application) : AndroidViewModel(application
             textFile.writeText("$currentLanguage,$learningLanguage")
         }
     }
-    //TODO create delete file function
+
+    fun deleteLanguages() {
+        textFile.delete()
+    }
 }

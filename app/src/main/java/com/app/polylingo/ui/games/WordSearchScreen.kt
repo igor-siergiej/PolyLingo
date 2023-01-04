@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.app.polylingo.R
 import com.app.polylingo.model.Entry
@@ -561,7 +562,6 @@ fun CreateErrorDialog(
 fun AreYouSureDialog(
     title: String,
     text: String,
-    navController: NavHostController,
     setCloseDialog: () -> Unit = {},
     deleteDictionary: () -> Unit = {}
 ) {
@@ -577,16 +577,6 @@ fun AreYouSureDialog(
             Button(
                 onClick = {
                     deleteDictionary()
-                    navController.navigate(Screen.Language.route) {
-                        // this should be navigating without being able to go back
-
-                        // TODO clear navigation
-                        // Avoid multiple copies of the same destination when
-                        // reselecting the same item
-                        launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
-                        restoreState = true
-                    }
                 }) {
                 Text(stringResource(id = R.string.sure))
             }
@@ -692,9 +682,9 @@ fun CreateTimer(
 }
 
 class Timer {
-    lateinit var timer: CountDownTimer
+    private lateinit var timer: CountDownTimer
     var timeInMilliSeconds = 0L
-    var tick = { timeLeft: Long -> }
+    var tick = { _: Long -> }
     var finish = {}
 
     fun createTimer(

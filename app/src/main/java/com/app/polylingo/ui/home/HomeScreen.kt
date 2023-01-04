@@ -41,6 +41,8 @@ fun HomeScreen(
                     modifier = Modifier.padding(8.dp),
                     dictionaryWords = entries.size
                 )
+            } else {
+                //TODO create a message saying add some words in the dictionary to begin learning
             }
 
         }

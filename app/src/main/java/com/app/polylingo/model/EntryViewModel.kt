@@ -28,14 +28,14 @@ class EntryViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     suspend fun removeAll() {
-            repository.removeAll()
+        repository.removeAll()
     }
 
     fun sortEntriesByWordAsc() {
         viewModelScope.launch(Dispatchers.IO) {
             val sortedList = repository.getSortedEntriesByWordAsc()
             removeAll()
-            sortedList.forEach{entry ->
+            sortedList.forEach { entry ->
                 addEntry(entry)
             }
         }
@@ -45,7 +45,7 @@ class EntryViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             val sortedList = repository.getSortedEntriesByWordDsc()
             removeAll()
-            sortedList.forEach{entry ->
+            sortedList.forEach { entry ->
                 addEntry(entry)
             }
         }
@@ -55,7 +55,7 @@ class EntryViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             val sortedList = repository.getSortedEntriesByTranslatedWordAsc()
             removeAll()
-            sortedList.forEach{entry ->
+            sortedList.forEach { entry ->
                 addEntry(entry)
             }
         }
@@ -65,7 +65,7 @@ class EntryViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             val sortedList = repository.getSortedEntriesByTranslatedWordDsc()
             removeAll()
-            sortedList.forEach{entry ->
+            sortedList.forEach { entry ->
                 addEntry(entry)
             }
         }

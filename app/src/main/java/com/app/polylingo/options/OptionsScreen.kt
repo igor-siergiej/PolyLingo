@@ -14,8 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.app.polylingo.R
+import com.app.polylingo.datasource.fileStorage.LanguageViewModel
 import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFABAndOptions
 import com.app.polylingo.ui.games.AreYouSureDialog
@@ -27,7 +29,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun OptionsScreen(
     navController: NavHostController,
-    entryViewModel: EntryViewModel
+    entryViewModel: EntryViewModel,
+    languageViewModel: LanguageViewModel
 ) {
     var coroutineScope = rememberCoroutineScope()
 
@@ -42,10 +45,21 @@ fun OptionsScreen(
         ) {
             OptionScreenContent(
                 modifier = Modifier.padding(8.dp),
-                navController = navController,
                 deleteDictionary = {
                     coroutineScope.launch(Dispatchers.IO) {
                         entryViewModel.removeAll()
+                        languageViewModel.deleteLanguages()
+                    }
+
+                    navController.navigate(Screen.Language.route) {
+                        popUpTo(0) {
+                            saveState = true
+                        }
+                        // Avoid multiple copies of the same destination when
+                        // reselecting the same item
+                        launchSingleTop = true
+                        // Restore state when reselecting a previously selected item
+                        restoreState = true
                     }
                 }
             )
@@ -56,7 +70,6 @@ fun OptionsScreen(
 @Composable
 private fun OptionScreenContent(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
     deleteDictionary: () -> Unit = {}
 ) {
     val audioManager = LocalContext.current.getSystemService(AUDIO_SERVICE) as AudioManager
@@ -127,7 +140,6 @@ private fun OptionScreenContent(
             AreYouSureDialog(
                 stringResource(R.string.back_dialog),
                 stringResource(R.string.deleting_dictionary),
-                navController,
                 setCloseDialog = {
                     openAreYouSureDialog = false
                 },

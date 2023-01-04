@@ -15,7 +15,7 @@ class PolyLingoRepository(application: Application) {
     }
 
     suspend fun removeAll() {
-        entryDao.deleteAll()
+        entryDao.removeAll()
     }
 
     suspend fun insertMultipleEntries(entries: MutableList<Entry>) {

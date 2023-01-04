@@ -108,17 +108,20 @@ private fun LanguageScreenContent(
                     if (currentLanguage.isEmpty()) {
                         currentTextFieldError = true
                     }
+
                     if (learningLanguage.isEmpty()) {
                         learningTextFieldError = true
                     }
+
                     if (!currentTextFieldError && !learningTextFieldError && currentLanguage != learningLanguage) {
                         // saving selected languages to file
                         CoroutineScope(Dispatchers.IO).launch {
                             languageViewModel.saveLanguages(currentLanguage,learningLanguage)
                         }
+
                         navController.navigate(Screen.Home.route) {
                             // this should be navigating without being able to go back
-                            popUpTo(navController.graph.findStartDestination().id) {
+                            popUpTo(0) {
                                 saveState = true
                             }
                             // Avoid multiple copies of the same destination when
