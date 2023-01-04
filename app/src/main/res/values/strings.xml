@@ -38,4 +38,5 @@
     <string name="time_left_description">Time left for current game</string>
     <string name="deleting_dictionary">This will delete your entire dictionary of words.</string>
     <string name="num_of_words">Number of words</string>
+    <string name="word_order_tip">Tap out the correct order of letters</string>
 </resources>

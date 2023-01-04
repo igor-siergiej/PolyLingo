@@ -22,10 +22,7 @@ import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.options.OptionsScreen
 import com.app.polylingo.ui.addWord.AddWordScreen
 import com.app.polylingo.ui.dictionary.DictionaryScreenTopLevel
-import com.app.polylingo.ui.games.GameConfigScreen
-import com.app.polylingo.ui.games.GamesScreen
-import com.app.polylingo.ui.games.MixAndMatchScreen
-import com.app.polylingo.ui.games.WordSearchScreen
+import com.app.polylingo.ui.games.*
 import com.app.polylingo.ui.home.HomeScreen
 import com.app.polylingo.ui.language.LanguageScreen
 import com.app.polylingo.ui.navigation.Screen
@@ -138,6 +135,21 @@ private fun BuildNavigationGraph(
             )
         ) { backStackEntry ->
             MixAndMatchScreen(
+                entryViewModel = entryViewModel,
+                navController = navController,
+                numOfWords = backStackEntry.arguments?.getInt("numOfWords")!!,
+                time = backStackEntry.arguments?.getInt("time")!!
+            )
+        }
+
+        composable(
+            route = "${Screen.WordOrder.route}/{numOfWords}/{time}",
+            arguments = listOf(
+                navArgument("numOfWords") { type = NavType.IntType },
+                (navArgument("time") { type = NavType.IntType })
+            )
+        ) { backStackEntry ->
+            WordOrderScreen(
                 entryViewModel = entryViewModel,
                 navController = navController,
                 numOfWords = backStackEntry.arguments?.getInt("numOfWords")!!,

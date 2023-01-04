@@ -130,7 +130,15 @@ private fun GameConfigScreenContent(
                         }
 
                         gameNamesList[2] -> {
-                            Toast.makeText(context, gameNamesList[2], Toast.LENGTH_SHORT).show()
+                            navController.navigate("${Screen.WordOrder.route}/${numOfWordsSliderPosition}/${timeSliderPosition}") {
+                                // this should be navigating without being able to go back
+                                popUpTo(Screen.Games.route)
+                                // Avoid multiple copies of the same destination when
+                                // reselecting the same item
+                                launchSingleTop = true
+                                // Restore state when reselecting a previously selected item
+                                restoreState = true
+                            }
                         }
                     }
 
