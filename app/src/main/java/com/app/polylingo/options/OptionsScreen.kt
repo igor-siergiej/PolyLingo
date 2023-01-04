@@ -88,6 +88,9 @@ private fun OptionScreenContent(
             .padding(5.dp)
             .verticalScroll(rememberScrollState()),
     ) {
+
+        Spacer(modifier = Modifier.height(15.dp))
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Start
@@ -114,6 +117,9 @@ private fun OptionScreenContent(
                 )
             }
         )
+        
+        Spacer(modifier = Modifier.height(20.dp))
+        
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Start

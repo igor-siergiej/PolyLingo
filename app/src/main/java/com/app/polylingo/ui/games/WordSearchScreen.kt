@@ -7,11 +7,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,7 +31,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.app.polylingo.R
 import com.app.polylingo.model.Entry
@@ -36,7 +38,6 @@ import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.ui.components.scaffolds.GameScaffold
 import com.app.polylingo.ui.navigation.Screen
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 @Composable
@@ -110,7 +111,7 @@ fun WordSearchContent(
     val entries = remember { getSortedEntries(entryList!!, numOfWords, numOfColumns, numOfRows) }
 
     val words = mutableListOf<String>()
-    var isFound = remember { mutableStateListOf<Boolean>() }
+    val isFound = remember { mutableStateListOf<Boolean>() }
     if (isFound.isEmpty()) {
         for (i in 0 until numOfWords) {
             isFound.add(false)
@@ -127,7 +128,7 @@ fun WordSearchContent(
     val cells = remember { List(numOfRows) { CharArray(numOfColumns) } }
 
     LaunchedEffect(Unit) {
-        var numAttempts = 0
+        var numAttempts: Int
         var retries = 0
 
         while (++retries < 100) {
@@ -198,7 +199,7 @@ fun WordSearchContent(
         for (i in 0 until numOfRows) {
             for (j in 0 until numOfColumns) {
                 if (cells[i][j] == '\u0000') {
-                    //cells[i][j] = Random.nextInt(97, 122).toChar()
+                    cells[i][j] = Random.nextInt(97, 122).toChar()
                 }
             }
         }
@@ -279,8 +280,8 @@ fun CreateGrid(
 
     val foundWordsIndex = remember { mutableListOf<Int>() }
 
-    var width = remember { mutableListOf(0) }
-    var height = remember { mutableListOf(0) }
+    val width = remember { mutableListOf(0) }
+    val height = remember { mutableListOf(0) }
 
     val coords = remember { mutableListOf<Pair<Int, Int>>() }
 
@@ -325,7 +326,7 @@ fun CreateGrid(
                         val selectionIndex = mutableListOf<Int>()
                         var selection = ""
                         while (colorStack.peek() != null) {
-                            selectionIndex.add(colorStack.peek().first)
+                            selectionIndex.add(colorStack.peek()!!.first)
                             selection += colorStack.pop().second
                         }
                         selection = selection.reversed()
@@ -376,7 +377,7 @@ fun CreateGrid(
                             ) {
                                 val peek = colorStack.peek()
                                 if (peek != null) {
-                                    if (colorStack.peek().first == index) {
+                                    if (colorStack.peek()!!.first == index) {
                                         break
                                     }
                                 }
@@ -635,7 +636,6 @@ fun CreateTimer(
     setOpenDialog: () -> Unit = {},
     timer: Timer
 ) {
-    //TODO fix layout
     val color = ProgressIndicatorDefaults.linearColor
 
     val indicatorColor = remember { mutableStateOf(color) }
@@ -650,15 +650,21 @@ fun CreateTimer(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        Row(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Icon(
                 modifier = Modifier.padding(5.dp),
-                imageVector = Icons.Filled.AccessTime,
+                imageVector = Icons.Filled.Timer,
                 contentDescription = stringResource(id = R.string.time_left_description)
             )
             Text(text = stringResource(id = R.string.time_left))
-            Text(text = (timer.timeInMilliSeconds / 1000).toString())
+            Text(text = (" " + timer.timeInMilliSeconds / 1000 + " Seconds"))
         }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         LinearProgressIndicator(
             modifier = Modifier.fillMaxWidth(),
             progress = animatedProgress,
@@ -699,7 +705,6 @@ class Timer {
         timer = object : CountDownTimer((timeInMilliSeconds), 100) {
             override fun onTick(millisUntilFinished: Long) {
                 timeInMilliSeconds = millisUntilFinished
-                println(timeInMilliSeconds)
                 tick(timeInMilliSeconds)
             }
 
@@ -725,7 +730,6 @@ class Timer {
         timer = object : CountDownTimer((timeInMilliSeconds), 100) {
             override fun onTick(millisUntilFinished: Long) {
                 timeInMilliSeconds = millisUntilFinished
-                println(timeInMilliSeconds)
                 tick(timeInMilliSeconds)
             }
 

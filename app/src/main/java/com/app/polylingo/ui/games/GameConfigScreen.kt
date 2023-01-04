@@ -2,24 +2,24 @@ package com.app.polylingo.ui.games
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Psychology
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.app.polylingo.R
-import com.app.polylingo.ui.components.MainTopBar
-import com.app.polylingo.ui.components.scaffolds.MainScaffold
-import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFAB
 import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFABAndOptions
 import com.app.polylingo.ui.navigation.Screen
 import com.app.polylingo.ui.theme.PolyLingoTheme
-import kotlinx.coroutines.launch
 
 @Composable
 fun GameConfigScreen(
@@ -59,8 +59,17 @@ private fun GameConfigScreenContent(
     Column(
         modifier = Modifier.padding(20.dp)
     ) {
-        //TODO ICONS?
-        Text(text = "Number of words: $numOfWordsSliderPosition")
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                modifier = Modifier.padding(5.dp),
+                imageVector = Icons.Filled.Psychology,
+                contentDescription = stringResource(id = R.string.num_of_words)
+            )
+            Text(text = "Number of words: $numOfWordsSliderPosition")
+        }
 
         Slider(
             value = numOfWordsSliderPosition.toFloat(),
@@ -69,7 +78,17 @@ private fun GameConfigScreenContent(
             steps = 2
         )
 
-        Text(text = "Time to do test: $timeSliderPosition")
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,) {
+            Icon(
+                modifier = Modifier.padding(5.dp),
+                imageVector = Icons.Filled.Timer,
+                contentDescription = stringResource(id = R.string.time_left_description)
+            )
+            Text(text = "Time to do test: $timeSliderPosition")
+        }
+
 
         Slider(
             value = timeSliderPosition.toFloat(),
@@ -87,7 +106,7 @@ private fun GameConfigScreenContent(
                     // TODO check that the number of entries allows to play a game with a certain amount of words
                     when (gameType) {
                         gameNamesList[0] -> {
-                            navController.navigate("${Screen.WordSearch.route}/${numOfWordsSliderPosition.toInt()}/${timeSliderPosition.toInt()}") {
+                            navController.navigate("${Screen.WordSearch.route}/${numOfWordsSliderPosition}/${timeSliderPosition}") {
                                 // this should be navigating without being able to go back
                                 popUpTo(Screen.Games.route)
                                 // Avoid multiple copies of the same destination when
@@ -99,7 +118,7 @@ private fun GameConfigScreenContent(
                         }
 
                         gameNamesList[1] -> {
-                            navController.navigate("${Screen.MixAndMatch.route}/${numOfWordsSliderPosition.toInt()}/${timeSliderPosition.toInt()}") {
+                            navController.navigate("${Screen.MixAndMatch.route}/${numOfWordsSliderPosition}/${timeSliderPosition}") {
                                 // this should be navigating without being able to go back
                                 popUpTo(Screen.Games.route)
                                 // Avoid multiple copies of the same destination when
@@ -126,7 +145,7 @@ private fun GameConfigScreenContent(
 @Composable
 private fun GameConfigScreenPreview() {
     PolyLingoTheme(dynamicColor = false) {
-        var navController = rememberNavController()
+        val navController = rememberNavController()
         GameConfigScreen(gameType = "Test", navController = navController)
     }
 }

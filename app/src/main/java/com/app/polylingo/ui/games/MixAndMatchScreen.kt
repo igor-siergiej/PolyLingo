@@ -10,10 +10,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.app.polylingo.R
 import com.app.polylingo.model.Entry
@@ -64,11 +67,11 @@ private fun MixAndMatchScreenContent(
     timer: Timer,
 ) {
     var numOfColumns = 0
-    when (numOfWords) {// TODO num of columns should probably be 3
+    when (numOfWords) {
         3 -> {
             numOfColumns = 3
         }
-        6, 9, 12 -> {
+        6,9, 12 -> {
             numOfColumns = 4
         }
     }
@@ -222,15 +225,44 @@ fun CreateWordGrid(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
+                            AutoSizeText(
                                 text = words[index],
-                                textAlign = TextAlign.Center,
+                                textStyle = TextStyle(fontSize = 16.sp),
                                 modifier = Modifier
                                     .padding(vertical = 25.dp)
                             )
                         }
                     }
                 )
+            }
+        }
+    )
+}
+
+@Composable
+fun AutoSizeText(
+    text: String,
+    textStyle: TextStyle,
+    modifier: Modifier = Modifier
+) {
+    var scaledTextStyle by remember { mutableStateOf(textStyle) }
+    var readyToDraw by remember { mutableStateOf(false) }
+
+    Text(
+        text,
+        modifier.drawWithContent {
+            if (readyToDraw) {
+                drawContent()
+            }
+        },
+        style = scaledTextStyle,
+        softWrap = false,
+        onTextLayout = { textLayoutResult ->
+            if (textLayoutResult.didOverflowWidth) {
+                scaledTextStyle =
+                    scaledTextStyle.copy(fontSize = scaledTextStyle.fontSize * 0.9)
+            } else {
+                readyToDraw = true
             }
         }
     )
