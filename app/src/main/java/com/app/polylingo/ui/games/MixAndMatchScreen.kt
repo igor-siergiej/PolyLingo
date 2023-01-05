@@ -122,6 +122,7 @@ private fun MixAndMatchScreenContent(
             },timer)
 
         if (openCompletedDialog) {
+            timer.pauseTimer()
             CreateCompletedDialog(
                 stringResource(R.string.congratulations),
                 stringResource(R.string.completed_game),

@@ -10,22 +10,19 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.app.polylingo.R
-import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.ui.components.scaffolds.GameScaffold
 import com.app.polylingo.ui.navigation.Screen
@@ -39,6 +36,29 @@ fun WordOrderScreen(
     time: Int
 ) {
     val timer = remember { Timer() }
+    var openCompletedDialog by remember { mutableStateOf(false) }
+    if (openCompletedDialog) {
+        timer.pauseTimer()
+        CreateCompletedDialog(
+            stringResource(R.string.congratulations),
+            stringResource(R.string.completed_game),
+            Screen.Home,
+            navController,
+        )
+    }
+
+    var entryList by remember {
+        mutableStateOf(
+            entryViewModel.entryList.value!!.asSequence().shuffled().take(numOfWords).distinct()
+                .toList()
+        )
+    }
+
+    val word = entryList.first().word.lowercase(Locale.ROOT)
+    var scrambledWord = word.toList().shuffled().joinToString(separator = "")
+
+
+
     GameScaffold(
         navController = navController,
         titleText = "$numOfWords $time",
@@ -54,11 +74,19 @@ fun WordOrderScreen(
         ) {
             WordOrderScreenContent(
                 modifier = Modifier.padding(5.dp),
-                entryViewModel = entryViewModel,
+                word = word,
+                scrambledWord = scrambledWord,
                 numOfWords = numOfWords,
                 time = time,
                 navController = navController,
-                timer = timer
+                timer = timer,
+                removeEntry = {
+                    if (entryList.size == 1) {
+                        openCompletedDialog = true
+                    } else {
+                        entryList = entryList.drop(1)
+                    }
+                }
             )
         }
     }
@@ -67,25 +95,56 @@ fun WordOrderScreen(
 @Composable
 private fun WordOrderScreenContent(
     modifier: Modifier,
-    entryViewModel: EntryViewModel,
+    word: String,
+    scrambledWord: String,
     numOfWords: Int,
     time: Int,
     navController: NavHostController,
     timer: Timer,
+    removeEntry: () -> Unit = {},
 ) {
-    val entryList = entryViewModel.entryList.value
-
-    val entries =
-        remember { entryList!!.asSequence().shuffled().take(numOfWords).toList().distinct() }
-
-
-
-    val word = remember { entries.first().word.toList().shuffled().joinToString(separator = "") }
-
     var currentlySelected by remember { mutableStateOf("_".repeat(word.length)) }
 
     var openOutOfTimeDialog by remember { mutableStateOf(false) }
-    var openCompletedDialog by remember { mutableStateOf(false) }
+
+
+
+    val cellBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
+
+
+    val selectionColors = remember { mutableStateMapOf<Int, Color>() }
+    val clickableColors = remember { mutableStateMapOf<Int, Color>() }
+
+    println(Integer.toHexString(cellBackgroundColor.toArgb()))
+    //TODO get colors in colors.xml or something
+
+    if (!currentlySelected.contains('_')) {
+        if (currentlySelected == word) {
+            word.forEachIndexed { index, _ ->
+                selectionColors[index] = cellBackgroundColor
+                clickableColors[index] = cellBackgroundColor
+            }
+            currentlySelected = ""
+            removeEntry()
+        } else {
+            currentlySelected.forEachIndexed { index, _ ->
+                selectionColors[index] = Color.Red
+            }
+            currentlySelected = "_".repeat(word.length)
+            word.forEachIndexed { index, _ ->
+                clickableColors[index] = cellBackgroundColor
+            }
+        }
+    }
+
+     word.forEachIndexed { index, _ ->
+        if (selectionColors[index] == null) {
+            selectionColors[index] = cellBackgroundColor
+        }
+        if (clickableColors[index] == null) {
+            clickableColors[index] = cellBackgroundColor
+        }
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -94,17 +153,14 @@ private fun WordOrderScreenContent(
             .padding(5.dp)
     ) {
         CreateLetterGrid(
-            word,
-            currentlySelected,
-            setOpenDialog = {
-                openCompletedDialog = true
-            },
-            updateSelection = {
-                var string = currentlySelected.toCharArray()
-                string[it.second] = it.first
-                currentlySelected = String(string)
+            scrambledWord,
+            clickableColors
+        ) { char ->
+            currentlySelected = currentlySelected.replaceFirst('_', char)
+            currentlySelected.forEachIndexed { index, _ ->
+                selectionColors[index] = cellBackgroundColor
             }
-        )
+        }
 
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -113,7 +169,10 @@ private fun WordOrderScreenContent(
             modifier = Modifier.fillMaxWidth()
         ) {
             FilledTonalIconButton(onClick = {
-                //reset selection
+                currentlySelected = "_".repeat(word.length)
+                word.forEachIndexed { index, _ ->
+                    clickableColors[index] = cellBackgroundColor
+                }
             }) {
                 Icon(
                     imageVector = Icons.Filled.Refresh,
@@ -125,11 +184,8 @@ private fun WordOrderScreenContent(
         Spacer(modifier = Modifier.height(10.dp))
 
         CreateSelectionGrid(
-            word,
             currentlySelected,
-            setOpenDialog = {
-                openCompletedDialog = true
-            }
+            selectionColors,
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -141,20 +197,11 @@ private fun WordOrderScreenContent(
             }, timer
         )
 
-        if (openCompletedDialog) {
-            CreateCompletedDialog(
-                stringResource(R.string.congratulations),
-                stringResource(R.string.completed_game),
-                Screen.Home,
-                navController,
-            )
-        }
-
         if (openOutOfTimeDialog) {
             CreateErrorDialog(
                 stringResource(R.string.out_of_time),
                 stringResource(R.string.better_luck),
-                Screen.MixAndMatch,
+                Screen.WordOrder,
                 navController,
                 numOfWords, time
             )
@@ -164,30 +211,18 @@ private fun WordOrderScreenContent(
 
 @Composable
 fun CreateLetterGrid(
-    entry: String,
-    currentlySelected: String,
-    updateSelection: (Pair<Char,Int>) -> Unit = {},
-    setOpenDialog: () -> Unit = {}
+    word: String,
+    colors: MutableMap<Int, Color>,
+    updateSelection: (Char) -> Unit = {},
 ) {
     val numOfColumns = 4
-    val cellBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
-
-    val wordArray = entry.toCharArray()
-
-    val colors = remember { mutableStateMapOf<Int, Color>() }
-
-    wordArray.forEachIndexed { index, _ ->
-        if (colors[index] == null) {
-            colors[index] = cellBackgroundColor
-        }
-    }
 
     LazyVerticalGrid(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         columns = GridCells.Fixed(numOfColumns)
     ) {
-        items(wordArray.size) { index ->
+        items(word.length) { index ->
             Card(
                 colors = CardDefaults.cardColors(
                     containerColor = colors[index]!!
@@ -197,7 +232,7 @@ fun CreateLetterGrid(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        updateSelection(wordArray[index] to index)
+                        updateSelection(word[index])
                         colors[index] = Color.Green
                     },
                 content = {
@@ -206,7 +241,7 @@ fun CreateLetterGrid(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = wordArray[index].toString().uppercase(Locale.ROOT),
+                            text = word[index].toString().uppercase(Locale.ROOT),
                             fontWeight = FontWeight.Bold,
                             fontSize = 30.sp,
                             textAlign = TextAlign.Center,
@@ -223,22 +258,10 @@ fun CreateLetterGrid(
 
 @Composable
 fun CreateSelectionGrid(
-    word: String,
     currentlySelected: String,
-    setOpenDialog: () -> Unit = {}
+    colors: MutableMap<Int, Color>,
 ) {
     val numOfColumns = 4
-
-    val cellBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
-
-    val colors = remember { mutableStateMapOf<Int, Color>() }
-
-    currentlySelected.forEachIndexed { index, _ ->
-        if (colors[index] == null) {
-            colors[index] = cellBackgroundColor
-        }
-    }
-    println(currentlySelected)
 
     LazyVerticalGrid(
         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -264,9 +287,3 @@ fun CreateSelectionGrid(
         }
     }
 }
-
-
-
-
-
-

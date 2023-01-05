@@ -240,6 +240,7 @@ fun WordSearchContent(
         )
 
         if (openCompletedDialog) {
+            timer.pauseTimer()
             CreateCompletedDialog(
                 stringResource(R.string.congratulations),
                 stringResource(R.string.completed_game),
