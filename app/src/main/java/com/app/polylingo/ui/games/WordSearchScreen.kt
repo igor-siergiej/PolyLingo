@@ -471,7 +471,6 @@ fun getSortedEntries(
     return returnList
 }
 
-
 @Composable
 fun CreateCompletedDialog(
     title: String,
@@ -560,39 +559,7 @@ fun CreateErrorDialog(
     )
 }
 
-@Composable
-fun AreYouSureDialog(
-    title: String,
-    text: String,
-    setCloseDialog: () -> Unit = {},
-    deleteDictionary: () -> Unit = {}
-) {
-    AlertDialog(
-        onDismissRequest = { setCloseDialog() },
-        title = {
-            Text(text = title, color = Color.Red)
-        },
-        text = {
-            Text(text = text, color = Color.Red)
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    deleteDictionary()
-                }) {
-                Text(stringResource(id = R.string.sure))
-            }
-        },
-        dismissButton = {
-            OutlinedButton(
-                onClick = {
-                    setCloseDialog()
-                }) {
-                Text(stringResource(id = R.string.nevermind))
-            }
-        }
-    )
-}
+
 
 @Composable
 fun CreateWordGrid(words: List<String>, isFound: List<Boolean>) {

@@ -12,6 +12,10 @@ sealed class Screen(val route: String) {
     object GameConfig: Screen("gameConfig")
     object Options: Screen("options")
 }
+// TODO create GameReviewScreen with parameters like time left,
+// TODO incorrectly matched words, correctly matched words
+// TODO create these variables in the games and pass them through
+// TODO user should be sent to review screen if they fail or not
 
 val screens = listOf(
     Screen.Home,

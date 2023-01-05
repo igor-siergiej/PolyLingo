@@ -7,7 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
@@ -53,11 +53,11 @@ fun WordOrderScreen(
                 .toList()
         )
     }
+    //TODO recomp happens here dunno why
 
     val word = entryList.first().word.lowercase(Locale.ROOT)
-    var scrambledWord = word.toList().shuffled().joinToString(separator = "")
 
-
+    val scrambledWord = word.toList().shuffled().joinToString(separator = "")
 
     GameScaffold(
         navController = navController,
@@ -107,10 +107,7 @@ private fun WordOrderScreenContent(
 
     var openOutOfTimeDialog by remember { mutableStateOf(false) }
 
-
-
     val cellBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
-
 
     val selectionColors = remember { mutableStateMapOf<Int, Color>() }
     val clickableColors = remember { mutableStateMapOf<Int, Color>() }
@@ -228,10 +225,10 @@ fun CreateLetterGrid(
                     containerColor = colors[index]!!
                 ),
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                shape = RoundedCornerShape(size = 10.dp),
+                shape = CircleShape,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable {
+                    .clickable { //TODO add sound effects
                         updateSelection(word[index])
                         colors[index] = Color.Green
                     },

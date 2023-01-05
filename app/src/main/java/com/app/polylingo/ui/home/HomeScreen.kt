@@ -44,7 +44,6 @@ fun HomeScreen(
             } else {
                 //TODO create a message saying add some words in the dictionary to begin learning
             }
-
         }
     }
 }
@@ -69,42 +68,11 @@ private fun HomeScreenContent(
                 .background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp))
         ) {
             Text(
-                text = "Words in dictionary = $dictionaryWords",
+                text = stringResource(id = R.string.words_in_dictionary) + "$dictionaryWords",
                 modifier = Modifier.padding(vertical = 20.dp),
                 textAlign = TextAlign.Center,
             )
         }
-
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp))
-        ) {
-            Text(
-                text = "Words in dictionary = $dictionaryWords",
-                modifier = Modifier.padding(vertical = 20.dp),
-                textAlign = TextAlign.Center,
-            )
-        }
-
-        //TODO Achievements screen?
-
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp))
-        ) {
-            Text(
-                text = "Words in dictionary = $dictionaryWords",
-                modifier = Modifier.padding(vertical = 20.dp),
-                textAlign = TextAlign.Center,
-            )
-        }
+        // TODO create more of these stats to put on home screen like
     }
 }
