@@ -95,6 +95,19 @@ fun MainTopBarWithoutOptions(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EmptyTopBar(
+    titleText: String
+) {
+    CenterAlignedTopAppBar(
+        title = { Text(titleText) },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
+        ),
+    )
+}
+
 //TODO should probably be in its own file
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -11,6 +11,7 @@ sealed class Screen(val route: String) {
     object WordOrder: Screen("wordOrder")
     object GameConfig: Screen("gameConfig")
     object Options: Screen("options")
+    object GameReview: Screen("gameReview")
 }
 // TODO create GameReviewScreen with parameters like time left,
 // TODO incorrectly matched words, correctly matched words

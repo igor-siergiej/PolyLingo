@@ -40,4 +40,7 @@
     <string name="num_of_words">Number of words</string>
     <string name="word_order_tip">Tap out the correct order of letters</string>
     <string name="words_in_dictionary">"Words in dictionary = "</string>
+    <string name="words_matched_correctly">"Words matched correctly: "</string>
+    <string name="words_matched_incorrectly">"Words matched incorrectly: "</string>
+    <string name="game_review">Game Review</string>
 </resources>

@@ -7,10 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.app.polylingo.ui.components.GameTopBar
-import com.app.polylingo.ui.components.MainBottomBar
-import com.app.polylingo.ui.components.MainTopBar
-import com.app.polylingo.ui.components.MainTopBarWithoutOptions
+import com.app.polylingo.ui.components.*
 import com.app.polylingo.ui.games.Timer
 import com.app.polylingo.ui.theme.PolyLingoTheme
 
@@ -63,6 +60,22 @@ fun GameScaffold(
     Scaffold(
         topBar = {
             GameTopBar(titleText,tipText,navController,timer)
+        },
+        content = { innerPadding ->
+            pageContent(innerPadding)
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GameReviewScaffold(
+    titleText: String,
+    pageContent: @Composable (innerPadding: PaddingValues) -> Unit = {}
+) {
+    Scaffold(
+        topBar = {
+            EmptyTopBar(titleText)
         },
         content = { innerPadding ->
             pageContent(innerPadding)

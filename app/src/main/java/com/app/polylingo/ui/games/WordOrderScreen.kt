@@ -35,14 +35,19 @@ fun WordOrderScreen(
     numOfWords: Int,
     time: Int
 ) {
+    var wordsMatchedCorrectly by remember{ mutableStateOf(0) }
+    var wordsMatchedIncorrectly by remember{mutableStateOf(0)}
+
     val timer = remember { Timer() }
+
     var openCompletedDialog by remember { mutableStateOf(false) }
+
     if (openCompletedDialog) {
         timer.pauseTimer()
         CreateCompletedDialog(
-            stringResource(R.string.congratulations),
-            stringResource(R.string.completed_game),
-            Screen.Home,
+            timer.timeLeft(),
+            wordsMatchedCorrectly,
+            wordsMatchedIncorrectly - wordsMatchedCorrectly,
             navController,
         )
     }
@@ -80,12 +85,18 @@ fun WordOrderScreen(
                 time = time,
                 navController = navController,
                 timer = timer,
+                wordsMatchedCorrectly = wordsMatchedCorrectly,
+                wordsMatchedIncorrectly = wordsMatchedIncorrectly,
                 removeEntry = {
+                    wordsMatchedCorrectly += 1
                     if (entryList.size == 1) {
                         openCompletedDialog = true
                     } else {
                         entryList = entryList.drop(1)
                     }
+                },
+                increaseIncorrectCounter = {
+                    wordsMatchedIncorrectly+= 1
                 }
             )
         }
@@ -101,7 +112,10 @@ private fun WordOrderScreenContent(
     time: Int,
     navController: NavHostController,
     timer: Timer,
+    wordsMatchedCorrectly : Int,
+    wordsMatchedIncorrectly : Int,
     removeEntry: () -> Unit = {},
+    increaseIncorrectCounter: () -> Unit = {}
 ) {
     var currentlySelected by remember { mutableStateOf("_".repeat(word.length)) }
 
@@ -124,6 +138,7 @@ private fun WordOrderScreenContent(
             currentlySelected = ""
             removeEntry()
         } else {
+            increaseIncorrectCounter()
             currentlySelected.forEachIndexed { index, _ ->
                 selectionColors[index] = Color.Red
             }
@@ -196,11 +211,13 @@ private fun WordOrderScreenContent(
 
         if (openOutOfTimeDialog) {
             CreateErrorDialog(
-                stringResource(R.string.out_of_time),
-                stringResource(R.string.better_luck),
                 Screen.WordOrder,
                 navController,
-                numOfWords, time
+                numOfWords,
+                time,
+                timer.timeLeft(),
+                wordsMatchedCorrectly,
+                wordsMatchedIncorrectly
             )
         }
     }

@@ -169,6 +169,22 @@ private fun BuildNavigationGraph(
             )
         }
 
+        composable(
+            route = "${Screen.GameReview.route}/{timeLeft}/{wordsMatchedCorrectly}/{wordsMatchedIncorrectly}",
+            arguments = listOf(
+                navArgument("timeLeft") { type = NavType.IntType },
+                navArgument("wordsMatchedCorrectly") { type = NavType.IntType },
+                navArgument("wordsMatchedIncorrectly") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            GameReviewScreen(
+                navController = navController,
+                timeLeft = backStackEntry.arguments?.getInt("timeLeft")!!,
+                wordsMatchedCorrectly = backStackEntry.arguments?.getInt("wordsMatchedCorrectly")!!,
+                wordsMatchedIncorrectly = backStackEntry.arguments?.getInt("wordsMatchedIncorrectly")!!
+            )
+        }
+
         composable(Screen.Options.route) { OptionsScreen(navController,entryViewModel,languageViewModel) }
     }
 }

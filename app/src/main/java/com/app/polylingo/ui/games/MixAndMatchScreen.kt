@@ -66,6 +66,8 @@ private fun MixAndMatchScreenContent(
     navController: NavHostController,
     timer: Timer,
 ) {
+    var wordsMatchedCorrectly by remember{ mutableStateOf(0) }
+    var wordsMatchedIncorrectly by remember{mutableStateOf(0)}
     var numOfColumns = 0
     when (numOfWords) {
         3 -> {
@@ -113,6 +115,12 @@ private fun MixAndMatchScreenContent(
         CreateWordGrid(numOfColumns, entries, isFound, words,
             setOpenDialog = {
                 openCompletedDialog = true
+            },
+            increaseCorrectCounter = {
+                wordsMatchedCorrectly += 1
+            },
+            increaseIncorrectCounter = {
+                wordsMatchedIncorrectly += 1
             }
         )
 
@@ -124,20 +132,22 @@ private fun MixAndMatchScreenContent(
         if (openCompletedDialog) {
             timer.pauseTimer()
             CreateCompletedDialog(
-                stringResource(R.string.congratulations),
-                stringResource(R.string.completed_game),
-                Screen.Home,
+                timer.timeLeft(),
+                wordsMatchedCorrectly,
+                wordsMatchedIncorrectly,
                 navController,
             )
         }
 
         if (openOutOfTimeDialog) {
             CreateErrorDialog(
-                stringResource(R.string.out_of_time),
-                stringResource(R.string.better_luck),
                 Screen.MixAndMatch,
                 navController,
-                numOfWords, time
+                numOfWords,
+                time,
+                timer.timeLeft(),
+                wordsMatchedCorrectly,
+                wordsMatchedIncorrectly
             )
         }
     }
@@ -149,7 +159,9 @@ fun CreateWordGrid(
     entries: List<Entry>,
     isFound: MutableList<Boolean>,
     words: MutableList<String>,
-    setOpenDialog: () -> Unit = {}
+    setOpenDialog: () -> Unit = {},
+    increaseCorrectCounter: () -> Unit = {},
+    increaseIncorrectCounter: () -> Unit = {}
 ) {
     val cellBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
 
@@ -194,11 +206,15 @@ fun CreateWordGrid(
                                         entries
                                     )
                                 ) {
+                                    increaseCorrectCounter()
                                     foundWordsIndex.add(index)
                                     foundWordsIndex.add(words.indexOf(currentlySelected))
                                     isFound[index] = true
                                     isFound[words.indexOf(currentlySelected)] = true
+                                } else {
+                                    increaseIncorrectCounter()
                                 }
+
                                 currentlySelected = ""
                             }
 

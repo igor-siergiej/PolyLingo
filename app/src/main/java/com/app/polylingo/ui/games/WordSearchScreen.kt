@@ -82,6 +82,8 @@ fun WordSearchContent(
     navController: NavHostController,
     timer: Timer,
 ) {
+    var wordsMatchedCorrectly by remember{ mutableStateOf(0) }
+    var wordsMatchedIncorrectly by remember{mutableStateOf(0)}
     val entryList = entryViewModel.entryList.value
 
     var numOfCells = 0
@@ -226,6 +228,12 @@ fun WordSearchContent(
         CreateGrid(numOfColumns, numOfRows, words, letters, isFound,
             setOpenDialog = {
                 openCompletedDialog = true
+            },
+            increaseCorrectCounter = {
+                wordsMatchedCorrectly += 1
+            },
+            increaseIncorrectCounter = {
+                wordsMatchedIncorrectly += 1
             }
         )
 
@@ -242,20 +250,22 @@ fun WordSearchContent(
         if (openCompletedDialog) {
             timer.pauseTimer()
             CreateCompletedDialog(
-                stringResource(R.string.congratulations),
-                stringResource(R.string.completed_game),
-                Screen.Home,
+                timer.timeLeft(),
+                wordsMatchedCorrectly,
+                wordsMatchedIncorrectly - wordsMatchedCorrectly,
                 navController,
             )
         }
 
         if (openOutOfTimeDialog) {
             CreateErrorDialog(
-                stringResource(R.string.out_of_time),
-                stringResource(R.string.better_luck),
                 Screen.WordSearch,
                 navController,
-                numOfWords, time
+                numOfWords,
+                time,
+                timer.timeLeft(),
+                wordsMatchedCorrectly,
+                wordsMatchedIncorrectly - wordsMatchedCorrectly
             )
         }
     }
@@ -268,7 +278,9 @@ fun CreateGrid(
     words: List<String>,
     letters: List<Char>,
     isFound: MutableList<Boolean>,
-    setOpenDialog: () -> Unit = {}
+    setOpenDialog: () -> Unit = {},
+    increaseCorrectCounter: () -> Unit = {},
+    increaseIncorrectCounter: () -> Unit = {}
 ) {
     val cellBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
 
@@ -334,10 +346,12 @@ fun CreateGrid(
 
                         words.forEachIndexed { index, word ->
                             if (selection == word) {
+                                increaseCorrectCounter()
                                 isFound[index] = true
                                 foundWordsIndex.addAll(selectionIndex)
                             }
                         }
+                        increaseIncorrectCounter()
 
                         letters.forEachIndexed { index, _ ->
                             if (!foundWordsIndex.contains(index)) {
@@ -473,26 +487,26 @@ fun getSortedEntries(
 
 @Composable
 fun CreateCompletedDialog(
-    title: String,
-    text: String,
-    screen: Screen,
+    timeLeft: Int,
+    wordsMatchedCorrectly: Int,
+    wordsMatchedIncorrectly: Int,
     navController: NavHostController,
 ) {
     AlertDialog(
         onDismissRequest = {
         },
         title = {
-            Text(text = title)
+            Text(text = stringResource(R.string.congratulations))
         },
         text = {
-            Text(text = text)
+            Text(text = stringResource(R.string.completed_game))
         },
         confirmButton = {
             Button(
                 onClick = {
-                    navController.navigate(screen.route) {
+                    navController.navigate("${Screen.GameReview.route}/${timeLeft}/${wordsMatchedCorrectly}/${wordsMatchedIncorrectly}") {
                         // this should be navigating without being able to go back
-                        popUpTo(Screen.Home.route)
+                        popUpTo(0)
                         // Avoid multiple copies of the same destination when
                         // reselecting the same item
                         launchSingleTop = true
@@ -508,21 +522,22 @@ fun CreateCompletedDialog(
 
 @Composable
 fun CreateErrorDialog(
-    title: String,
-    text: String,
     retryScreen: Screen,
     navController: NavHostController,
     numOfWords: Int,
-    time: Int
+    time: Int,
+    timeLeft :Int,
+    wordsMatchedCorrectly: Int,
+    wordsMatchedIncorrectly: Int
 ) {
     AlertDialog(
         onDismissRequest = {
         },
         title = {
-            Text(text = title, color = Color.Red)
+            Text(text = stringResource(R.string.out_of_time), color = Color.Red)
         },
         text = {
-            Text(text = text, color = Color.Red)
+            Text(text = stringResource(R.string.better_luck), color = Color.Red)
         },
         confirmButton = {
             Button(
@@ -543,9 +558,9 @@ fun CreateErrorDialog(
         dismissButton = {
             OutlinedButton(
                 onClick = {
-                    navController.navigate(Screen.Home.route) {
+                    navController.navigate("${Screen.GameReview.route}/${timeLeft}/${wordsMatchedCorrectly}/${wordsMatchedIncorrectly}") {
                         // this should be navigating without being able to go back
-                        popUpTo(Screen.Home.route)
+                        popUpTo(0)
                         // Avoid multiple copies of the same destination when
                         // reselecting the same item
                         launchSingleTop = true
@@ -655,6 +670,7 @@ fun CreateTimer(
     }
 }
 
+//TODO create file for this
 class Timer {
     private lateinit var timer: CountDownTimer
     var timeInMilliSeconds = 0L
@@ -706,5 +722,9 @@ class Timer {
             }
         }
         timer.start()
+    }
+
+    fun timeLeft(): Int {
+        return (timeInMilliSeconds/1000).toInt()
     }
 }
