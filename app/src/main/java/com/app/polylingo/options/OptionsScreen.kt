@@ -69,8 +69,8 @@ private fun OptionScreenContent(
     deleteDictionary: () -> Unit = {}
 ) {
     val audioManager = LocalContext.current.getSystemService(AUDIO_SERVICE) as AudioManager
-    val volumeLevel = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-    val maxVolumeLevel = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+    val volumeLevel = audioManager.getStreamVolume(AudioManager.STREAM_SYSTEM)
+    val maxVolumeLevel = audioManager.getStreamMaxVolume(AudioManager.STREAM_SYSTEM)
 
     val currentVolume = remember {
         mutableStateOf(volumeLevel)
@@ -108,7 +108,7 @@ private fun OptionScreenContent(
                 currentVolume.value = it.toInt()
 
                 audioManager.setStreamVolume(
-                    AudioManager.STREAM_MUSIC,
+                    AudioManager.STREAM_SYSTEM,
                     currentVolume.value, 0 // Set volume to slider position
                 )
             }

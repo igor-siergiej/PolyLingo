@@ -1,6 +1,9 @@
 package com.app.polylingo.ui.games
 
+import android.content.Context
+import android.media.AudioManager
 import android.os.CountDownTimer
+import android.view.SoundEffectConstants
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -26,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -216,7 +220,8 @@ fun WordSearchContent(
         }
     }
 
-
+    val audioManager = LocalContext.current.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    val volumeLevel = audioManager.getStreamVolume(AudioManager.STREAM_SYSTEM)
 
 
     Column(
@@ -231,9 +236,11 @@ fun WordSearchContent(
             },
             increaseCorrectCounter = {
                 wordsMatchedCorrectly += 1
+                audioManager.playSoundEffect(AudioManager.FX_KEY_CLICK, volumeLevel.toFloat())
             },
             increaseIncorrectCounter = {
                 wordsMatchedIncorrectly += 1
+                audioManager.playSoundEffect(AudioManager.FX_KEYPRESS_INVALID, volumeLevel.toFloat())
             }
         )
 
@@ -252,7 +259,7 @@ fun WordSearchContent(
             CreateCompletedDialog(
                 timer.timeLeft(),
                 wordsMatchedCorrectly,
-                wordsMatchedIncorrectly - wordsMatchedCorrectly,
+                wordsMatchedIncorrectly,
                 navController,
             )
         }
@@ -265,7 +272,7 @@ fun WordSearchContent(
                 time,
                 timer.timeLeft(),
                 wordsMatchedCorrectly,
-                wordsMatchedIncorrectly - wordsMatchedCorrectly
+                wordsMatchedIncorrectly
             )
         }
     }
@@ -344,14 +351,20 @@ fun CreateGrid(
                         }
                         selection = selection.reversed()
 
+                        var wordFound = false
+
                         words.forEachIndexed { index, word ->
                             if (selection == word) {
                                 increaseCorrectCounter()
+                                wordFound = true
                                 isFound[index] = true
                                 foundWordsIndex.addAll(selectionIndex)
                             }
                         }
-                        increaseIncorrectCounter()
+
+                        if (!wordFound) {
+                            increaseIncorrectCounter()
+                        }
 
                         letters.forEachIndexed { index, _ ->
                             if (!foundWordsIndex.contains(index)) {

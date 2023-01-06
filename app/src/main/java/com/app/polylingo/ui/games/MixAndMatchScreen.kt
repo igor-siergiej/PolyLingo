@@ -1,5 +1,7 @@
 package com.app.polylingo.ui.games
 
+import android.content.Context
+import android.media.AudioManager
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -102,6 +105,9 @@ private fun MixAndMatchScreenContent(
         words.addAll(temp)
     }
 
+    val audioManager = LocalContext.current.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    val volumeLevel = audioManager.getStreamVolume(AudioManager.STREAM_SYSTEM)
+
     var openOutOfTimeDialog by remember { mutableStateOf(false) }
     var openCompletedDialog by remember { mutableStateOf(false) }
 
@@ -118,9 +124,11 @@ private fun MixAndMatchScreenContent(
             },
             increaseCorrectCounter = {
                 wordsMatchedCorrectly += 1
+                audioManager.playSoundEffect(AudioManager.FX_KEY_CLICK, volumeLevel.toFloat())
             },
             increaseIncorrectCounter = {
                 wordsMatchedIncorrectly += 1
+                audioManager.playSoundEffect(AudioManager.FX_KEYPRESS_INVALID, volumeLevel.toFloat())
             }
         )
 

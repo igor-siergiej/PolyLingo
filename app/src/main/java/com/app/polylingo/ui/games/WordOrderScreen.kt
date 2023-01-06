@@ -1,5 +1,7 @@
 package com.app.polylingo.ui.games
 
+import android.content.Context
+import android.media.AudioManager
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -47,7 +50,7 @@ fun WordOrderScreen(
         CreateCompletedDialog(
             timer.timeLeft(),
             wordsMatchedCorrectly,
-            wordsMatchedIncorrectly - wordsMatchedCorrectly,
+            wordsMatchedIncorrectly,
             navController,
         )
     }
@@ -63,6 +66,9 @@ fun WordOrderScreen(
     val word = entryList.first().word.lowercase(Locale.ROOT)
 
     val scrambledWord = word.toList().shuffled().joinToString(separator = "")
+
+    val audioManager = LocalContext.current.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    val volumeLevel = audioManager.getStreamVolume(AudioManager.STREAM_SYSTEM)
 
     GameScaffold(
         navController = navController,
@@ -89,6 +95,7 @@ fun WordOrderScreen(
                 wordsMatchedIncorrectly = wordsMatchedIncorrectly,
                 removeEntry = {
                     wordsMatchedCorrectly += 1
+                    audioManager.playSoundEffect(AudioManager.FX_KEY_CLICK, volumeLevel.toFloat())
                     if (entryList.size == 1) {
                         openCompletedDialog = true
                     } else {
@@ -97,6 +104,7 @@ fun WordOrderScreen(
                 },
                 increaseIncorrectCounter = {
                     wordsMatchedIncorrectly+= 1
+                    audioManager.playSoundEffect(AudioManager.FX_KEYPRESS_INVALID, volumeLevel.toFloat())
                 }
             )
         }
@@ -138,7 +146,9 @@ private fun WordOrderScreenContent(
             currentlySelected = ""
             removeEntry()
         } else {
+        if (currentlySelected != "") {
             increaseIncorrectCounter()
+        }
             currentlySelected.forEachIndexed { index, _ ->
                 selectionColors[index] = Color.Red
             }
