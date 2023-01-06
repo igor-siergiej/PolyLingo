@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -34,7 +33,7 @@ fun MixAndMatchScreen(
     numOfWords: Int,
     time: Int
 ) {
-    val timer = remember{ Timer()}
+    val timer = remember { Timer() }
     GameScaffold(
         navController = navController,
         titleText = "$numOfWords $time",
@@ -69,14 +68,14 @@ private fun MixAndMatchScreenContent(
     navController: NavHostController,
     timer: Timer,
 ) {
-    var wordsMatchedCorrectly by remember{ mutableStateOf(0) }
-    var wordsMatchedIncorrectly by remember{mutableStateOf(0)}
+    var wordsMatchedCorrectly by remember { mutableStateOf(0) }
+    var wordsMatchedIncorrectly by remember { mutableStateOf(0) }
     var numOfColumns = 0
     when (numOfWords) {
         3 -> {
             numOfColumns = 3
         }
-        6,9, 12 -> {
+        6, 9, 12 -> {
             numOfColumns = 4
         }
     }
@@ -128,14 +127,18 @@ private fun MixAndMatchScreenContent(
             },
             increaseIncorrectCounter = {
                 wordsMatchedIncorrectly += 1
-                audioManager.playSoundEffect(AudioManager.FX_KEYPRESS_INVALID, volumeLevel.toFloat())
+                audioManager.playSoundEffect(
+                    AudioManager.FX_KEYPRESS_INVALID,
+                    volumeLevel.toFloat()
+                )
             }
         )
 
-      CreateTimer(time = time,
+        CreateTimer(time = time,
             setOpenDialog = {
                 openOutOfTimeDialog = true
-            },timer)
+            }, timer
+        )
 
         if (openCompletedDialog) {
             timer.pauseTimer()

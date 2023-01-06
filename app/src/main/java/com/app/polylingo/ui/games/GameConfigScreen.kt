@@ -1,6 +1,5 @@
 package com.app.polylingo.ui.games
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Psychology
@@ -9,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,11 +51,9 @@ private fun GameConfigScreenContent(
     var numOfWordsSliderPosition by remember { mutableStateOf(3) }
     var timeSliderPosition by remember { mutableStateOf(30) }
 
-    val context = LocalContext.current
-
     val gameNamesList = stringArrayResource(id = R.array.game_names_list).toList()
     Column(
-        modifier = Modifier.padding(20.dp)
+        modifier = modifier.padding(20.dp)
     ) {
         Row(
             Modifier.fillMaxWidth(),
@@ -80,7 +76,8 @@ private fun GameConfigScreenContent(
 
         Row(
             Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,) {
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Icon(
                 modifier = Modifier.padding(5.dp),
                 imageVector = Icons.Filled.Timer,
@@ -88,7 +85,6 @@ private fun GameConfigScreenContent(
             )
             Text(text = "Time to do test: $timeSliderPosition")
         }
-
 
         Slider(
             value = timeSliderPosition.toFloat(),

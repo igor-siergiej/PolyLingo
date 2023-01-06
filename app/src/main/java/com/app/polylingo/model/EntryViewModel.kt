@@ -1,10 +1,8 @@
 package com.app.polylingo.model
 
 import android.app.Application
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.app.polylingo.datasource.PolyLingoRepository
 import kotlinx.coroutines.Dispatchers

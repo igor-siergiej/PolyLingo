@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.Speaker
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -19,6 +18,7 @@ import androidx.navigation.NavHostController
 import com.app.polylingo.R
 import com.app.polylingo.datasource.fileStorage.LanguageViewModel
 import com.app.polylingo.model.EntryViewModel
+import com.app.polylingo.ui.components.dialogs.AreYouSureDialog
 import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFABAndOptions
 import com.app.polylingo.ui.navigation.Screen
 import kotlinx.coroutines.Dispatchers
@@ -48,13 +48,9 @@ fun OptionsScreen(
                         entryViewModel.removeAll()
                         languageViewModel.deleteLanguages()
                     }
-
                     navController.navigate(Screen.Language.route) {
                         popUpTo(0)
-                        // Avoid multiple copies of the same destination when
-                        // reselecting the same item
                         launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
                         restoreState = true
                     }
                 }
@@ -151,36 +147,3 @@ private fun OptionScreenContent(
     }
 }
 
-@Composable
-fun AreYouSureDialog(
-    title: String,
-    text: String,
-    setCloseDialog: () -> Unit = {},
-    deleteDictionary: () -> Unit = {}
-) {
-    AlertDialog(
-        onDismissRequest = { setCloseDialog() },
-        title = {
-            Text(text = title, color = Color.Red)
-        },
-        text = {
-            Text(text = text, color = Color.Red)
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    deleteDictionary()
-                }) {
-                Text(stringResource(id = R.string.sure))
-            }
-        },
-        dismissButton = {
-            OutlinedButton(
-                onClick = {
-                    setCloseDialog()
-                }) {
-                Text(stringResource(id = R.string.nevermind))
-            }
-        }
-    )
-}

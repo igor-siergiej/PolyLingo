@@ -73,6 +73,5 @@ private fun HomeScreenContent(
                 textAlign = TextAlign.Center,
             )
         }
-        // TODO create more of these stats to put on home screen like
     }
 }

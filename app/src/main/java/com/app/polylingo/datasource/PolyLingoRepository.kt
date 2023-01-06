@@ -18,10 +18,6 @@ class PolyLingoRepository(application: Application) {
         entryDao.removeAll()
     }
 
-    suspend fun insertMultipleEntries(entries: MutableList<Entry>) {
-        entryDao.insertMultipleEntries(entries)
-    }// is this needed?
-
     fun getAllEntries() = entryDao.getAllEntries()
 
     fun getSortedEntriesByWordAsc() = entryDao.getAllEntriesSortedByWordAsc()

@@ -9,7 +9,6 @@ import java.io.File
 
 const val FILENAME = "languages.txt"
 
-// TODO does this have to extendViewModel class?
 class LanguageViewModel(application: Application) : AndroidViewModel(application) {
 
     private var textFile = File(application.filesDir, FILENAME)
@@ -20,8 +19,8 @@ class LanguageViewModel(application: Application) : AndroidViewModel(application
 
     fun readLanguages(): Pair<String, String> {
         return if (doesFileExist()) {
-            var readString = textFile.readText()
-            var list = ArrayList<String>()
+            val readString = textFile.readText()
+            val list = ArrayList<String>()
             list.addAll(readString.split(","))
             Pair(list[0],list[1])
         } else {

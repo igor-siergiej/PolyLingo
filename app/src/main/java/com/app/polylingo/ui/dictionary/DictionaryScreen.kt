@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
@@ -16,9 +17,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,7 +27,6 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.app.polylingo.R
 import com.app.polylingo.datasource.fileStorage.LanguageViewModel
@@ -37,7 +37,7 @@ import com.app.polylingo.ui.components.scaffolds.MainScaffold
 @Composable
 fun DictionaryScreenTopLevel(
     navController: NavHostController,
-    entryViewModel: EntryViewModel = viewModel(),
+    entryViewModel: EntryViewModel,
     languageViewModel: LanguageViewModel
 ) {
     val entries = entryViewModel.entryList.observeAsState(listOf())
@@ -110,12 +110,12 @@ fun DictionaryScreen(
                                     .padding(vertical = 20.dp)
                                     .fillMaxSize()
                                     .clickable {
-                                        if (sortedByWord == false) {
+                                        sortedByWord = if (!sortedByWord) {
                                             sortByWordAsc()
-                                            sortedByWord = true
+                                            true
                                         } else {
                                             sortByWordDesc()
-                                            sortedByWord = false
+                                            false
                                         }
                                     }
                             )
@@ -135,12 +135,12 @@ fun DictionaryScreen(
                                     .weight(1f)
                                     .padding(vertical = 20.dp)
                                     .clickable {
-                                        if (sortedByTranslatedWord == false) {
+                                        sortedByTranslatedWord = if (!sortedByTranslatedWord) {
                                             sortByTranslatedWordAsc()
-                                            sortedByTranslatedWord = true
+                                            true
                                         } else {
                                             sortByTranslatedWordDesc()
-                                            sortedByTranslatedWord = false
+                                            false
                                         }
                                     }
                             )

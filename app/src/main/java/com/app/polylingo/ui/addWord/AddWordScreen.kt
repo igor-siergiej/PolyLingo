@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -20,20 +19,30 @@ import com.app.polylingo.datasource.fileStorage.LanguageViewModel
 import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.ui.components.scaffolds.MainScaffoldWithoutFAB
-import com.app.polylingo.ui.games.GameConfigScreen
 import com.app.polylingo.ui.navigation.Screen
 import com.app.polylingo.ui.theme.PolyLingoTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
-fun AddWordScreen(
+fun AddWordScreenTopLevel(
     navController: NavHostController,
     entryViewModel: EntryViewModel,
     languageViewModel: LanguageViewModel
 ) {
+    AddWordScreen(
+        navController = navController,
+        languages = languageViewModel.readLanguages(),
+        insertEntry = { newEntry ->
+            entryViewModel.addEntry(newEntry)
+        }
+    )
+}
 
+@Composable
+fun AddWordScreen(
+    navController: NavHostController,
+    languages: Pair<String, String>,
+    insertEntry: (Entry) -> Unit = {}
+) {
     MainScaffoldWithoutFAB(
         navController = navController,
         titleText = stringResource(id = R.string.add_entry)
@@ -46,10 +55,8 @@ fun AddWordScreen(
             AddWordScreenContent(
                 modifier = Modifier.padding(8.dp),
                 navController = navController,
-                languages = languageViewModel.readLanguages(),
-                insertEntry = { newEntry ->
-                    entryViewModel.addEntry(newEntry)
-                }
+                languages = languages,
+                insertEntry = insertEntry
             )
         }
     }
@@ -68,7 +75,7 @@ private fun AddWordScreenContent(
     var currentTextFieldError by remember { mutableStateOf(false) }
     var learningTextFieldError by remember { mutableStateOf(false) }
 
-    var supportingText = stringResource(id = R.string.please_enter_word)
+    val supportingText = stringResource(id = R.string.please_enter_word)
 
     Column(
         modifier = modifier
@@ -82,8 +89,12 @@ private fun AddWordScreenContent(
                 word = it
                 currentTextFieldError = false
             },
-            label = { Text(text = stringResource(id = R.string.enter_word)
-                    + " " + languages.first) },
+            label = {
+                Text(
+                    text = stringResource(id = R.string.enter_word)
+                            + " " + languages.first
+                )
+            },
             isError = currentTextFieldError,
             supportingText = {
                 if (currentTextFieldError) {
@@ -100,8 +111,12 @@ private fun AddWordScreenContent(
                 translatedWord = it
                 learningTextFieldError = false
             },
-            label = { Text(text = stringResource(id = R.string.enter_word)
-                    + " " + languages.second) },
+            label = {
+                Text(
+                    text = stringResource(id = R.string.enter_word)
+                            + " " + languages.second
+                )
+            },
             isError = learningTextFieldError,
             supportingText = {
                 if (learningTextFieldError) {
@@ -128,7 +143,7 @@ private fun AddWordScreenContent(
                     }
                     //TODO robustness: catch exception when word is already in the dictionary
                     if (!currentTextFieldError && !learningTextFieldError && word != translatedWord) {
-                        insertEntry(Entry(word,translatedWord))
+                        insertEntry(Entry(word, translatedWord))
                         navController.navigate(Screen.Dictionary.route) {
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
@@ -157,11 +172,10 @@ private fun AddWordScreenContent(
 @Composable
 private fun AddWordScreenPreview() {
     PolyLingoTheme(dynamicColor = false) {
-        //TODO REMOVE VIEW MODELS FROM THIS, CREATE ADD WORD SCREEN TOP LEVEL
-        var navController = rememberNavController()
-        var entryViewModel: EntryViewModel = viewModel()
-        var languageViewModel: LanguageViewModel = viewModel()
-        AddWordScreen(entryViewModel = entryViewModel, navController = navController,
-        languageViewModel = languageViewModel)
+        val navController = rememberNavController()
+        AddWordScreen(
+            navController,
+            "Preview" to "Preview",
+        )
     }
 }

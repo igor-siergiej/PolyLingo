@@ -21,10 +21,12 @@ import com.app.polylingo.model.Entry
 import com.app.polylingo.model.EntryViewModel
 import com.app.polylingo.options.OptionsScreen
 import com.app.polylingo.ui.addWord.AddWordScreen
+import com.app.polylingo.ui.addWord.AddWordScreenTopLevel
 import com.app.polylingo.ui.dictionary.DictionaryScreenTopLevel
 import com.app.polylingo.ui.games.*
 import com.app.polylingo.ui.home.HomeScreen
 import com.app.polylingo.ui.language.LanguageScreen
+import com.app.polylingo.ui.language.LanguageScreenTopLevel
 import com.app.polylingo.ui.navigation.Screen
 import com.app.polylingo.ui.theme.PolyLingoTheme
 import kotlinx.coroutines.launch
@@ -102,10 +104,10 @@ private fun BuildNavigationGraph(
 
         composable(Screen.Games.route) { GamesScreen(navController) }
 
-        composable(Screen.Language.route) { LanguageScreen(navController, languageViewModel) }
+        composable(Screen.Language.route) { LanguageScreenTopLevel(navController, languageViewModel) }
 
         composable(Screen.AddWord.route) {
-            AddWordScreen(
+            AddWordScreenTopLevel(
                 navController,
                 entryViewModel,
                 languageViewModel

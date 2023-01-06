@@ -3,7 +3,6 @@ package com.app.polylingo.ui.games
 import android.content.Context
 import android.media.AudioManager
 import android.os.CountDownTimer
-import android.view.SoundEffectConstants
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -16,7 +15,6 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -86,8 +84,8 @@ fun WordSearchContent(
     navController: NavHostController,
     timer: Timer,
 ) {
-    var wordsMatchedCorrectly by remember{ mutableStateOf(0) }
-    var wordsMatchedIncorrectly by remember{mutableStateOf(0)}
+    var wordsMatchedCorrectly by remember { mutableStateOf(0) }
+    var wordsMatchedIncorrectly by remember { mutableStateOf(0) }
     val entryList = entryViewModel.entryList.value
 
     var numOfCells = 0
@@ -240,7 +238,10 @@ fun WordSearchContent(
             },
             increaseIncorrectCounter = {
                 wordsMatchedIncorrectly += 1
-                audioManager.playSoundEffect(AudioManager.FX_KEYPRESS_INVALID, volumeLevel.toFloat())
+                audioManager.playSoundEffect(
+                    AudioManager.FX_KEYPRESS_INVALID,
+                    volumeLevel.toFloat()
+                )
             }
         )
 
@@ -539,7 +540,7 @@ fun CreateErrorDialog(
     navController: NavHostController,
     numOfWords: Int,
     time: Int,
-    timeLeft :Int,
+    timeLeft: Int,
     wordsMatchedCorrectly: Int,
     wordsMatchedIncorrectly: Int
 ) {
@@ -586,7 +587,6 @@ fun CreateErrorDialog(
         }
     )
 }
-
 
 
 @Composable
@@ -738,6 +738,6 @@ class Timer {
     }
 
     fun timeLeft(): Int {
-        return (timeInMilliSeconds/1000).toInt()
+        return (timeInMilliSeconds / 1000).toInt()
     }
 }

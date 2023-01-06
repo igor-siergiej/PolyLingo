@@ -13,7 +13,7 @@ import com.app.polylingo.R
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.app.polylingo.ui.components.MainBottomBar
-import com.app.polylingo.ui.components.MainTopBar
+import com.app.polylingo.ui.components.topAppBars.MainTopBar
 import com.app.polylingo.ui.navigation.Screen
 import com.app.polylingo.ui.theme.PolyLingoTheme
 
@@ -37,23 +37,11 @@ fun MainScaffold(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
-                    /*coroutineScope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = "Add cat",
-                            actionLabel = "Undo"
-                        )
-                    }*/
                     navController.navigate(Screen.AddWord.route) {
-                        // Pop up to the start destination of the graph to
-                        // avoid building up a large stack of destinations
-                        // on the back stack as users select items
                         popUpTo(navController.graph.findStartDestination().id) {
                             saveState = true
                         }
-                        // Avoid multiple copies of the same destination when
-                        // reselecting the same item
                         launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
                         restoreState = true
                     }
                 },
@@ -72,7 +60,7 @@ fun MainScaffold(
 @Composable
 private fun MainScaffoldPreview() {
     PolyLingoTheme(dynamicColor = false) {
-        var navController = rememberNavController()
+        val navController = rememberNavController()
         MainScaffold(navController = navController, titleText = "test", pageContent = {})
     }
 }

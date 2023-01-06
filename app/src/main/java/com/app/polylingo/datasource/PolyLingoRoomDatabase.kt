@@ -10,7 +10,6 @@ import com.app.polylingo.model.EntryDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
 
 @Database(entities = [Entry::class], version = 1)
 abstract class PolyLingoRoomDatabase : RoomDatabase() {
